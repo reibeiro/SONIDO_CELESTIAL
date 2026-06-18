@@ -1,0 +1,875 @@
+:root {
+    --primary-color: #ffffff;
+    --secondary-color: #b3b3b3;
+    --accent-color: #fcad04;
+    /* Gold Brand Color */
+    --accent-glow: rgba(252, 173, 4, 0.4);
+    --album-art: none;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    min-height: 100dvh;
+    background:
+        radial-gradient(circle at 50% 22%, rgba(252, 173, 4, 0.22), transparent 30%),
+        radial-gradient(circle at 50% 58%, rgba(252, 173, 4, 0.14), transparent 26%),
+        linear-gradient(180deg, #05070a 0%, #0b0b0d 48%, #070707 100%);
+    color: var(--primary-color);
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Space Background (Kept but darkened) */
+#space-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+    /* Darker to let UI pop */
+}
+
+/* Ambient Background Layer */
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: var(--album-art);
+    background-size: cover;
+    background-position: center;
+    filter: blur(36px) brightness(0.26) saturate(1.1);
+    z-index: 0;
+    transition: background-image 1s ease;
+}
+
+/* Main Container - Full Screen Flex */
+.player-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    padding: 20px 20px 30px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 1. Header */
+.header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 4px;
+    margin-bottom: 8px;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-icon {
+    font-size: 1.75rem;
+    color: var(--accent-color);
+}
+
+.brand-name {
+    font-size: clamp(1.55rem, 6vw, 2.25rem);
+    font-weight: 700;
+    color: var(--accent-color);
+    letter-spacing: 0.5px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+/* History Button — glassmorphism circle */
+.history-toggle {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: rgba(252, 173, 4, 0.05);
+    border: 1px solid rgba(252, 173, 4, 0.22);
+    color: var(--accent-color);
+    font-size: 1.35rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.history-toggle:active {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(0.92);
+}
+
+.panel-open .history-toggle {
+    transform: rotate(45deg);
+}
+
+/* 2. Artwork */
+.art-container {
+    flex-grow: 0.4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 8px 0 16px;
+    max-height: 25vh;
+}
+
+.album-art-wrapper {
+    width: 100%;
+    max-width: min(230px, 42vw);
+    aspect-ratio: 1/1;
+    box-shadow: 0 0 55px rgba(252, 173, 4, 0.32), 0 18px 60px rgba(0, 0, 0, 0.7);
+    border-radius: 28px;
+    overflow: hidden;
+}
+
+#radio-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.playing #radio-logo {
+    /* Subtle breathe effect instead of pulse */
+    animation: breathe 4s infinite ease-in-out;
+}
+
+@keyframes breathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+/* 3. Now Playing Card (Spotify-style) */
+.now-playing-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.055);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    margin-bottom: 14px;
+    position: relative;
+}
+
+#mini-art {
+    width: 88px;
+    height: 88px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.now-playing-info {
+    flex: 1;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.np-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+    display: block;
+    text-transform: uppercase;
+}
+
+#song-title {
+    font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+    font-weight: 700;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    color: #ffffff;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+#artist-name {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.playing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 5px 14px 5px 10px;
+    background: var(--accent-color);
+    border-radius: 999px;
+    color: #121212;
+    opacity: 0;
+    transition: opacity 0.3s;
+    letter-spacing: 0.3px;
+}
+
+.indicator-bar {
+    width: 2.5px;
+    background: #121212;
+    border-radius: 2px;
+    animation: equalizer 0.8s ease-in-out infinite alternate;
+    opacity: 0.85;
+}
+
+.indicator-bar:nth-child(1) {
+    height: 8px;
+    animation-delay: 0s;
+}
+
+.indicator-bar:nth-child(2) {
+    height: 14px;
+    animation-delay: 0.15s;
+}
+
+.indicator-bar:nth-child(3) {
+    height: 6px;
+    animation-delay: 0.3s;
+}
+
+@keyframes equalizer {
+    0% { height: 4px; }
+    100% { height: 16px; }
+}
+
+/* 4. Audio Visualizer */
+.visualizer-container {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0 8px;
+}
+
+.visualizer-track {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 78px;
+}
+
+.v-bar {
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(to top, var(--accent-color) 0%, #fce38a 50%, #ffffff 100%);
+    border-radius: 999px;
+    transform-origin: bottom;
+    animation: modern-wave 1.8s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.035s);
+    box-shadow: 0 0 10px rgba(252, 173, 4, 0.25);
+}
+
+.v-bar:nth-child(3n) { animation-duration: 2s; }
+.v-bar:nth-child(3n+1) { animation-duration: 1.6s; }
+
+@keyframes modern-wave {
+    0%, 100% { transform: scaleY(0.05); }
+    12% { transform: scaleY(0.7); }
+    25% { transform: scaleY(0.2); }
+    37% { transform: scaleY(0.9); }
+    50% { transform: scaleY(0.1); }
+    62% { transform: scaleY(0.5); }
+    75% { transform: scaleY(0.85); }
+    87% { transform: scaleY(0.3); }
+}
+
+/* 5. Social Row */
+.social-row {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid rgba(252, 173, 4, 0.2);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.055);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    flex: 1;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0;
+    color: #eeeeee;
+    font-size: 0.86rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.social-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* 6. Controls Row */
+.controls-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.play-btn.primary {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-color) 0%, #e09900 100%);
+    color: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.2rem;
+    box-shadow: 0 0 0 11px rgba(252, 173, 4, 0.08), 0 0 0 24px rgba(252, 173, 4, 0.045), 0 0 40px rgba(252, 173, 4, 0.56), 0 10px 24px rgba(0, 0, 0, 0.55);
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    position: relative;
+}
+
+.play-btn.primary::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-color);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.play-btn.primary.playing::after {
+    animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.12); opacity: 0.15; }
+    100% { transform: scale(1.25); opacity: 0; }
+}
+
+.play-btn.primary.playing {
+    box-shadow: 0 0 0 11px rgba(252, 173, 4, 0.12), 0 0 0 24px rgba(252, 173, 4, 0.07), 0 0 50px rgba(252, 173, 4, 0.6), 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+
+.play-btn.primary:active {
+    transform: scale(0.9);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* 7. Volume Row */
+.volume-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 10px;
+    margin-bottom: 12px;
+}
+
+.volume-row i {
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--accent-color), rgba(255, 255, 255, 0.14));
+    border-radius: 2px;
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* 8. Bottom Navigation */
+.bottom-nav {
+    position: sticky;
+    bottom: 0;
+    z-index: 999;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    background: rgba(12, 12, 14, 0.97);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    min-height: 60px;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 50px;
+    border: none;
+    border-radius: 13px;
+    background: transparent;
+    color: #9a9ca2;
+    font: inherit;
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.nav-icon {
+    font-size: 1rem;
+    line-height: 1;
+    filter: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-item span {
+    font-size: 0.58rem;
+    font-weight: 600;
+}
+
+.nav-item .nav-icon + span {
+    color: inherit;
+}
+
+.nav-item.active {
+    color: var(--accent-color);
+    background: linear-gradient(145deg, rgba(252, 173, 4, 0.19), rgba(252, 173, 4, 0.07));
+    box-shadow: inset 0 0 0 1px rgba(252, 173, 4, 0.11), 0 0 18px rgba(252, 173, 4, 0.12);
+    position: relative;
+}
+
+.nav-item.active .nav-icon {
+    filter: drop-shadow(0 0 8px rgba(252, 173, 4, 0.65));
+    transform: translateY(-1px);
+}
+
+.nav-item.active::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px rgba(252, 173, 4, 0.8);
+}
+
+.nav-item:active {
+    transform: scale(0.94);
+}
+
+/* History Overlay */
+.history-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 9;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.history-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* History Panel — V1 style */
+.history-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 80vw;
+    max-width: 320px;
+    height: 100%;
+    z-index: 10;
+    background: #161616;
+    border-left: 1px solid rgba(252, 173, 4, 0.15);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.6);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.history-panel.active {
+    transform: translateX(0);
+}
+
+.history-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 16px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.history-panel-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    letter-spacing: 0.3px;
+}
+
+.history-close {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-close:active {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+/* History list */
+.history-list {
+    overflow-y: auto;
+    padding: 0 0 8px;
+    flex: 1;
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 20px;
+    transition: background 0.15s;
+}
+
+.history-item:active {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.history-item-art {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.history-item-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.history-item-title {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-item-artist {
+    font-size: 0.75rem;
+    color: var(--secondary-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+}
+
+.history-item-time {
+    font-size: 0.65rem;
+    color: var(--secondary-color);
+    flex-shrink: 0;
+    opacity: 0.45;
+}
+
+.history-empty {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--secondary-color);
+    font-size: 0.85rem;
+}
+
+/* Scrollbar styling */
+.history-list::-webkit-scrollbar {
+    width: 3px;
+}
+
+.history-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+
+/* 9. Bible Section */
+.bible-section {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.bible-section.active {
+    display: flex;
+}
+
+.bible-verse-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 36px 28px 32px;
+    background: linear-gradient(160deg, rgba(252, 173, 4, 0.10), rgba(252, 173, 4, 0.03));
+    border: 1px solid rgba(252, 173, 4, 0.2);
+    border-radius: 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 0 40px rgba(252, 173, 4, 0.08);
+}
+
+.bible-cross {
+    font-size: 2.4rem;
+    color: var(--accent-color);
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+
+.bible-verse-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.8;
+}
+
+.bible-verse-text {
+    font-size: clamp(1.2rem, 5vw, 1.65rem);
+    font-weight: 500;
+    color: #ffffff;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    font-style: italic;
+}
+
+.bible-verse-ref {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    letter-spacing: 0.5px;
+}
+
+/* Hide player content when bible is active */
+.bible-active .player-content {
+    display: none;
+}
+
+@media (max-height: 760px) {
+    .player-container { padding: 14px 18px 24px; }
+    .brand-name { font-size: 1.35rem; }
+    .history-toggle { width: 46px; height: 46px; font-size: 1.1rem; }
+    .art-container { margin: 4px 0 10px; max-height: 18vh; flex-grow: 0.3; }
+    .album-art-wrapper { max-width: 142px; border-radius: 20px; }
+    .now-playing-card { padding: 14px 16px; border-radius: 14px; margin-bottom: 8px; gap: 12px; }
+    #mini-art { width: 68px; height: 68px; border-radius: 10px; }
+    .np-label { font-size: 0.6rem; margin-bottom: 4px; }
+    #song-title { font-size: 1.05rem; line-height: 1.15; margin-bottom: 3px; }
+    #artist-name { font-size: 0.82rem; line-height: 1.15; margin-bottom: 6px; }
+    .playing-indicator { font-size: 0.62rem; padding: 4px 12px 4px 8px; }
+    .visualizer-track { height: 48px; gap: 3px; }
+    .v-bar { width: 4px; }
+    .play-btn.primary { width: 72px; height: 72px; font-size: 1.75rem; box-shadow: 0 0 0 10px rgba(252,173,4,.08), 0 0 34px rgba(252,173,4,.5); }
+    .social-row { padding: 6px 8px; margin-bottom: 8px; }
+    .social-label { font-size: 0.68rem; }
+    .volume-row { margin-bottom: 8px; }
+    .volume-row i { font-size: 0.9rem; width: 16px; }
+    .controls-row { margin-bottom: 8px; }
+    .bottom-nav { padding: 5px; border-radius: 16px; min-height: 54px; }
+    .nav-item { min-height: 44px; gap: 2px; border-radius: 12px; }
+    .nav-icon { font-size: 0.95rem; }
+    .nav-item span { font-size: 0.54rem; }
+    .nav-item.active::after { width: 4px; height: 4px; bottom: 3px; }
+    .bible-verse-card { padding: 28px 22px 26px; border-radius: 20px; }
+}
+
+@media (max-width: 380px) {
+    .player-container { padding-left: 14px; padding-right: 14px; }
+    .now-playing-card { gap: 10px; }
+    #mini-art { width: 64px; height: 64px; }
+    .social-link { gap: 5px; padding-left: 6px; padding-right: 6px; }
+}
+
+@media (max-height: 640px) {
+    .player-container { padding: 10px 14px 20px; }
+    .header-bar { margin-bottom: 4px; }
+    .brand-icon { font-size: 1.15rem; }
+    .brand-name { font-size: 1.15rem; }
+    .history-toggle { width: 36px; height: 36px; font-size: 0.95rem; }
+    .art-container { margin: 2px 0 6px; max-height: 14vh; flex-grow: 0.15; }
+    .album-art-wrapper { max-width: 110px; border-radius: 16px; }
+    .now-playing-card { gap: 10px; padding: 10px 12px; border-radius: 12px; margin-bottom: 4px; }
+    #mini-art { width: 54px; height: 54px; border-radius: 8px; }
+    .np-label { font-size: 0.52rem; margin-bottom: 3px; letter-spacing: 0.6px; }
+    #song-title { font-size: 0.88rem; line-height: 1.1; margin-bottom: 2px; }
+    #artist-name { font-size: 0.72rem; line-height: 1.1; margin-bottom: 5px; }
+    .playing-indicator { font-size: 0.5rem; padding: 3px 10px 3px 6px; gap: 3px; }
+    .visualizer-track { height: 34px; gap: 3px; }
+    .v-bar { width: 4px; }
+    .v-bar { width: 4px; }
+    .play-btn.primary { width: 60px; height: 60px; font-size: 1.5rem; box-shadow: 0 0 0 9px rgba(252,173,4,.08), 0 0 0 20px rgba(252,173,4,.045), 0 0 28px rgba(252,173,4,.48); }
+    .social-row { padding: 5px 8px; margin-bottom: 4px; border-radius: 16px; }
+    .social-link { gap: 5px; padding: 5px 6px; font-size: 0.65rem; }
+    .social-link i { font-size: 0.85rem; }
+    .social-label { font-size: 0.58rem; }
+    .controls-row { margin-bottom: 4px; }
+    .volume-row { gap: 8px; padding: 0 6px; margin-bottom: 4px; }
+    .volume-row i { font-size: 0.75rem; width: 14px; }
+    .bottom-nav { padding: 5px; border-radius: 15px; min-height: 48px; }
+    .nav-item { min-height: 38px; gap: 2px; border-radius: 11px; }
+    .nav-icon { font-size: 0.85rem; }
+    .nav-item span { font-size: 0.5rem; }
+    .nav-item.active::after { width: 3px; height: 3px; bottom: 2px; }
+    .bible-verse-card { padding: 22px 18px 20px; border-radius: 18px; }
+    .bible-cross { font-size: 1.8rem; margin-bottom: 8px; }
+    .bible-verse-label { font-size: 0.6rem; margin-bottom: 12px; }
+    .bible-verse-ref { font-size: 0.8rem; }
+}
+
+@media (max-height: 480px) {
+    .player-container { padding: 6px 10px 12px; gap: 2px; }
+    .header-bar { margin-bottom: 2px; }
+    .brand-icon { font-size: 0.9rem; }
+    .brand-name { font-size: 0.9rem; }
+    .history-toggle { width: 28px; height: 28px; font-size: 0.75rem; }
+    .art-container { max-height: 40px; margin: 0; flex-grow: 0; }
+    .album-art-wrapper { max-width: 40px; border-radius: 10px; box-shadow: 0 0 16px rgba(252,173,4,.25); }
+    .now-playing-card { gap: 6px; padding: 6px 8px; border-radius: 8px; margin-bottom: 2px; }
+    #mini-art { width: 32px; height: 32px; border-radius: 6px; }
+    .np-label { font-size: 0.38rem; margin-bottom: 1px; letter-spacing: 0.4px; }
+    #song-title { font-size: 0.65rem; line-height: 1; margin-bottom: 1px; }
+    #artist-name { font-size: 0.55rem; line-height: 1; margin-bottom: 3px; }
+    .playing-indicator { font-size: 0.4rem; padding: 2px 8px 2px 5px; gap: 2px; }
+    .visualizer-track { height: 20px; gap: 2px; }
+    .v-bar { width: 3px; }
+    .v-bar { width: 3px; }
+    .play-btn.primary { width: 38px; height: 38px; font-size: 0.95rem; box-shadow: 0 0 0 5px rgba(252,173,4,.08), 0 0 14px rgba(252,173,4,.48); }
+    .social-row { padding: 3px 4px; border-radius: 10px; margin-bottom: 2px; }
+    .social-link { gap: 3px; padding: 3px 4px; font-size: 0.48rem; }
+    .social-link i { font-size: 0.6rem; }
+    .social-label { font-size: 0.45rem; }
+    .controls-row { margin-bottom: 2px; }
+    .volume-row { gap: 5px; padding: 0 4px; margin-bottom: 2px; }
+    .volume-row i { font-size: 0.55rem; width: 10px; }
+    input[type=range] { height: 2px; }
+    input[type=range]::-webkit-slider-thumb { width: 10px; height: 10px; box-shadow: 0 0 4px var(--accent-glow); }
+    .bottom-nav { padding: 3px; border-radius: 10px; min-height: 36px; }
+    .nav-item { min-height: 30px; gap: 1px; border-radius: 8px; }
+    .nav-icon { font-size: 0.7rem; }
+    .nav-item span { font-size: 0.38rem; }
+    .nav-item.active::after { width: 3px; height: 3px; bottom: 1px; box-shadow: none; }
+    .bible-verse-card { padding: 16px 14px 14px; border-radius: 14px; }
+    .bible-cross { font-size: 1.4rem; margin-bottom: 6px; }
+    .bible-verse-label { font-size: 0.5rem; margin-bottom: 8px; letter-spacing: 1.2px; }
+    .bible-verse-text { font-size: clamp(0.85rem, 4vw, 1rem); }
+    .bible-verse-ref { font-size: 0.65rem; }
+}
+
+@media (max-width: 360px) {
+    .player-container { padding-left: 10px; padding-right: 10px; }
+    .now-playing-card { gap: 6px; }
+    #mini-art { width: 46px; height: 46px; }
+    .social-link { gap: 4px; padding-left: 4px; padding-right: 4px; }
+    .social-link i { font-size: 0.7rem; }
+    .social-label { font-size: 0.52rem; }
+}

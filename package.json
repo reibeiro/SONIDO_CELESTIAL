@@ -1,0 +1,16 @@
+{
+  "name": "radio-sonido-celestial",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "lint:js": "eslint script.js",
+    "lint:css": "stylelint style.css",
+    "lint": "npm run lint:js && npm run lint:css",
+    "sync": "powershell -File sync-assets.ps1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "stylelint": "^16.3.0",
+    "stylelint-config-standard": "^36.0.0"
+  }
+}

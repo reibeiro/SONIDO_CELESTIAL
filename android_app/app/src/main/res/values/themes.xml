@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.SonidoCelestial" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/gold_primary</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/gold_container</item>
+        <item name="colorOnPrimaryContainer">@color/black</item>
+        <item name="colorSecondary">@color/gold_secondary</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/gold_container</item>
+        <item name="colorOnSecondaryContainer">@color/black</item>
+        <item name="colorTertiary">@color/gold_tertiary</item>
+        <item name="colorOnTertiary">@color/black</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="colorOnBackground">@color/white</item>
+        <item name="android:statusBarColor" tools:targetApi="35">@color/dark_background</item>
+        <item name="android:navigationBarColor" tools:targetApi="35">@color/dark_background</item>
+    </style>
+
+    <style name="Theme.SonidoCelestial.NoActionBar" parent="Theme.SonidoCelestial">
+    </style>
+
+    <!-- Splash Screen Theme (Android 12+ via core-splashscreen) -->
+    <style name="Theme.SonidoCelestial.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <item name="postSplashScreenTheme">@style/Theme.SonidoCelestial</item>
+    </style>
+</resources>

@@ -1,0 +1,64 @@
+# Archivos de compilación de Gradle
+.gradle/
+build/
+app/build/
+*.iml
+*.class
+*.jar
+*.war
+
+# Archivos de Android Studio
+.idea/
+*.iws
+*.ipr
+captures/
+.externalNativeBuild/
+
+# Archivos de configuración local
+local.properties
+keystore.properties
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs y archivos temporales
+*.log
+*.hprof
+*.tmp
+*.temp
+
+# Archivos de respaldo
+*.rar
+*.zip
+*.tar.gz
+*.7z
+*.bak
+*.backup
+.backup_v1/
+
+# Dependencias de Node (si usas)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos de keystore (¡NUNCA subirlos!)
+*.jks
+*.keystore
+*.p12
+*.pfx
+
+# Archivos de rendimiento
+perfetto/
+trace/
+
+# Archivos de distribución compilados (APK/AAB)
+# Se excluyen por defecto, pero se incluye el APK de release para distribución directa
+*.apk
+*.aab
+!android_app/app/release/*.apk
+
+# Archivos de versiones anteriores (obsoletos)
+*.apk.old
+*.aab.old

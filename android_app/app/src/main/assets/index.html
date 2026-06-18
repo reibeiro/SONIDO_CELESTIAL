@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sonido Celestial</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' https: data:; media-src 'self' https:; connect-src 'self' https: https://bible-api.com; manifest-src 'self';">
+</head>
+
+<body>
+    <div class="background-overlay"></div>
+    <canvas id="space-canvas"></canvas>
+
+    <main class="player-container">
+        <!-- Main Player UI -->
+        <div class="header-bar">
+            <div class="header-brand">
+                <span class="brand-icon">✦</span>
+                <span class="brand-name">Sonido Celestial</span>
+            </div>
+            <div class="header-right">
+                <button id="history-btn" class="history-toggle" aria-label="Historial">
+                    <i class="far fa-bell"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="player-content" id="player-content">
+            <div class="art-container">
+                <div class="album-art-wrapper">
+                    <img src="logo.png" alt="Radio Logo" id="radio-logo">
+                </div>
+            </div>
+
+            <div class="now-playing-card" id="now-playing-card">
+                <img src="logo.png" id="mini-art" alt="Album Art">
+                <div class="now-playing-info">
+                    <span class="np-label"><i class="fas fa-signal"></i> AHORA SONANDO</span>
+                    <div id="song-title">Cargando...</div>
+                    <div id="artist-name">Radio Sonido Celestial</div>
+                    <span class="playing-indicator">
+                        <span class="indicator-bar"></span>
+                        <span class="indicator-bar"></span>
+                        <span class="indicator-bar"></span>
+                        EN VIVO
+                    </span>
+                </div>
+            </div>
+
+        <div class="visualizer-container">
+            <div class="visualizer-track" id="visualizer-track"></div>
+        </div>
+
+            <div class="social-row">
+                <a href="https://www.facebook.com/profile.php?id=61564215665120" target="_blank"
+                    class="social-link" aria-label="Visit Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span class="social-label">Facebook</span>
+                </a>
+                <a href="https://wa.me/573145377834" target="_blank" class="social-link"
+                    aria-label="Chat on WhatsApp">
+                    <i class="fab fa-whatsapp"></i>
+                    <span class="social-label">WhatsApp</span>
+                </a>
+                <a href="https://wa.me/?text=Escucha%20Radio%20Sonido%20Celestial" target="_blank" class="social-link"
+                    aria-label="Compartir Radio Sonido Celestial">
+                    <i class="fas fa-share-nodes"></i>
+                    <span class="social-label">Compartir</span>
+                </a>
+            </div>
+
+            <div class="controls-row">
+                <button id="play-pause-btn" class="play-btn primary" aria-label="Play/Pause">
+                    <i class="fas fa-play"></i>
+                </button>
+            </div>
+
+            <div class="volume-row">
+                <i class="fas fa-volume-down"></i>
+                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
+                <i class="fas fa-volume-up"></i>
+            </div>
+        </div>
+
+        <!-- Bible Section -->
+        <div class="bible-section" id="bible-section">
+            <div class="bible-verse-card">
+                <div class="bible-cross">✝</div>
+                <div class="bible-verse-label">Versículo del Día</div>
+                <div class="bible-verse-text">"Todo lo puedo en Cristo que me fortalece."</div>
+                <div class="bible-verse-ref">Filipenses 4:13</div>
+            </div>
+        </div>
+
+            <audio id="audioPlayer" preload="none"></audio>
+
+        <nav class="bottom-nav" aria-label="Navegacion principal">
+            <button class="nav-item active" type="button" aria-label="Inicio">
+                <i class="fas fa-home nav-icon" aria-hidden="true"></i>
+                <span>Inicio</span>
+            </button>
+            <button class="nav-item" type="button" aria-label="Biblia">
+                <i class="fas fa-book-open nav-icon" aria-hidden="true"></i>
+                <span>Biblia</span>
+            </button>
+            <button id="bottom-history-btn" class="nav-item" type="button" aria-label="Abrir historial">
+                <i class="fas fa-clock-rotate-left nav-icon" aria-hidden="true"></i>
+                <span>Historial</span>
+            </button>
+            <!-- Botón de Ajustes oculto temporalmente -->
+            <!--
+            <button class="nav-item" type="button" aria-label="Ajustes">
+                <i class="fas fa-gear nav-icon" aria-hidden="true"></i>
+                <span>Ajustes</span>
+            </button>
+            -->
+        </nav>
+
+        <!-- History Panel -->
+        <div id="history-overlay" class="history-overlay"></div>
+        <div id="history-panel" class="history-panel">
+            <div class="history-panel-header">
+                <span class="history-panel-title" id="history-panel-title">🕒 Historial reciente</span>
+                <button id="history-close" class="history-close" aria-label="Cerrar historial">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="history-list" id="history-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
