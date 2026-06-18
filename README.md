@@ -6,7 +6,7 @@ Aplicación de radio para Android.
 [⬇️ Descargar APK](https://github.com/tu-usuario/sonido-celestial/releases/latest)
 
 ## 📸 Capturas
-(Agrega imágenes aquí)
+<img width="1080" height="2400" alt="Screenshot" src="https://github.com/user-attachments/assets/164765b2-2792-4c7a-8cbe-5d2e3b180bd0" />
 
 ## 🛠️ Tecnologías
 - Kotlin
