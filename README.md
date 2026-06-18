@@ -68,7 +68,7 @@ Sonido Celestial Radio es una aplicación móvil que te permite escuchar nuestra
 <p align="center">
   <img src="screenshots/home.png" width="200" alt="Pantalla principal">
   <img src="screenshots/player.png" width="200" alt="Reproductor">
-  <img src="screenshots/now_playing.png" width="200" alt="Ahora en vivo">
+   <img src="/logo.png ">
 </p>
 
 <!-- ========================================== -->
