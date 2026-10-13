@@ -77,7 +77,7 @@ Sonido Celestial Radio es una aplicación móvil que te permite escuchar nuestra
 
 ### 📲 Desde el APK
 
-1. **Descarga** el APK desde [aquí](https://github.com/reibeiro/SONIDO_CELESTIAL/releases/latest)
+1. **Descarga** el APK desde [aquí](https://play.google.com/store/apps/details?id=com.sonidocelestial.radio)
 2. **Habilita** "Instalar desde orígenes desconocidos" en tu Android
 3. **Abre** el archivo APK descargado
 4. **Sigue** las instrucciones de instalación
