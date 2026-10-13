@@ -24,7 +24,7 @@
 <!-- ========================================== -->
 
 <p align="center">
-  <a href="https://github.com/reibeiro/SONIDO_CELESTIAL/releases/latest">
+  <a href="https://play.google.com/store/apps/details?id=com.sonidocelestial.radio">
     <img src="https://img.shields.io/badge/📲%20DESCARGAR%20APK-FF6B00?style=for-the-badge&logo=android&logoColor=white" alt="Descargar APK">
   </a>
   <a href="https://github.com/reibeiro/SONIDO_CELESTIAL">
