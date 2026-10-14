@@ -8,12 +8,18 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 import android.widget.ImageView
 import android.widget.TextView
@@ -30,6 +36,8 @@ import com.google.android.material.color.DynamicColors
 class MainActivity : AppCompatActivity() {
 
     private lateinit var myWebView: WebView
+    private var customView: View? = null
+    private var customViewCallback: WebChromeClient.CustomViewCallback? = null
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -71,12 +79,16 @@ class MainActivity : AppCompatActivity() {
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
         webSettings.mediaPlaybackRequiresUserGesture = false
-        webSettings.allowFileAccess = false
-        webSettings.allowContentAccess = false
-        // allowFileAccessFromFileURLs is deprecated and false by default on API 16+
+        webSettings.allowFileAccess = true
+        webSettings.allowContentAccess = true
+        @Suppress("DEPRECATION")
+        webSettings.allowFileAccessFromFileURLs = true
+        @Suppress("DEPRECATION")
+        webSettings.allowUniversalAccessFromFileURLs = true
         webSettings.javaScriptCanOpenWindowsAutomatically = false
 
         myWebView.webViewClient = MyWebViewClient()
+        myWebView.webChromeClient = MyWebChromeClient()
         myWebView.addJavascriptInterface(RadioInterface(this), "Android")
         myWebView.loadUrl("file:///android_asset/index.html")
 
@@ -85,8 +97,42 @@ class MainActivity : AppCompatActivity() {
                 != PackageManager.PERMISSION_GRANTED
             ) {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                MyFirebaseMessagingService.subscribeToEventsTopic()
             }
+        } else {
+            MyFirebaseMessagingService.subscribeToEventsTopic()
         }
+
+        // Native Firestore Realtime Push Notification Listener
+        try {
+            var isInitialLoad = true
+            FirebaseFirestore.getInstance()
+                .collection("notification_requests")
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .limit(1)
+                .addSnapshotListener { snapshot, _ ->
+                    if (isInitialLoad) {
+                        isInitialLoad = false
+                        return@addSnapshotListener
+                    }
+                    snapshot?.documentChanges?.forEach { change ->
+                        if (change.type == DocumentChange.Type.ADDED) {
+                            val data = change.document.data
+                            val title = data["title"]?.toString() ?: "Radio Sonido Celestial"
+                            val body = data["body"]?.toString() ?: "¡Hay un evento en vivo disponible!"
+                            val img = data["imageUrl"]?.toString()
+                            val type = data["type"]?.toString()
+                            val targetTab = if (type == "verse" || title.contains("Versículo", ignoreCase = true)) "bible" else null
+                            MyFirebaseMessagingService.showStaticPushNotification(this, title, body, img, targetTab)
+                        }
+                    }
+                }
+        } catch (e: Exception) {
+            Log.w("MainActivity", "Firestore push listener error", e)
+        }
+
+        handlePushTargetTab(intent)
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -117,8 +163,61 @@ class MainActivity : AppCompatActivity() {
         }, 2200)
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handlePushTargetTab(intent)
+    }
+
+    private fun handlePushTargetTab(intent: Intent?) {
+        val targetTab = intent?.getStringExtra("target_tab")
+        if (targetTab == "bible") {
+            Handler(Looper.getMainLooper()).postDelayed({
+                myWebView.evaluateJavascript("if(window.openBibleSection) window.openBibleSection();", null)
+            }, 800)
+        }
+    }
+
+    private inner class MyWebChromeClient : WebChromeClient() {
+        override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+            if (customView != null) {
+                onHideCustomView()
+                return
+            }
+            customView = view
+            customViewCallback = callback
+            (window.decorView as android.view.ViewGroup).addView(
+                customView,
+                android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            )
+            myWebView.visibility = View.GONE
+        }
+
+        override fun onHideCustomView() {
+            if (customView == null) return
+            (window.decorView as android.view.ViewGroup).removeView(customView)
+            customView = null
+            myWebView.visibility = View.VISIBLE
+            customViewCallback?.onCustomViewHidden()
+        }
+
+        override fun onPermissionRequest(request: PermissionRequest?) {
+            runOnUiThread {
+                request?.grant(request.resources)
+            }
+        }
+    }
+
     @Suppress("DEPRECATION")
     private inner class MyWebViewClient : WebViewClient() {
+        override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+            handlePushTargetTab(intent)
+        }
+
         @Suppress("DEPRECATION")
         override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: android.net.http.SslError?) {
             handler?.cancel()
@@ -128,19 +227,34 @@ class MainActivity : AppCompatActivity() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val url = request.url.toString()
 
+            // Intercept YouTube, Facebook, WhatsApp, Intent schemes, and open in external native apps
+            if (url.contains("youtube.com") || url.contains("youtu.be") ||
+                url.contains("facebook.com") || url.contains("fb.watch") || url.startsWith("fb://") ||
+                url.contains("wa.me") || url.contains("privacy-policy") ||
+                url.startsWith("intent://") || url.startsWith("vnd.youtube:")
+            ) {
+                return try {
+                    val intent = if (url.startsWith("intent://")) {
+                        Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
+                    } else {
+                        Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    }
+                    startActivity(intent)
+                    true
+                } catch (_: Exception) {
+                    false
+                }
+            }
+
             if (url.startsWith("http://") || url.startsWith("https://")) {
                 return false
             }
 
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            val pm = packageManager
-            if (pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).isEmpty()) {
-                return true
-            }
             return try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(intent)
                 true
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 true
             }
         }

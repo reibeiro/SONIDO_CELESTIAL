@@ -15,6 +15,17 @@ self.addEventListener('install', (e) => {
     );
 });
 
+self.addEventListener('activate', (e) => {
+    e.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.filter((k) => k !== CACHE_NAME)
+                    .map((k) => caches.delete(k))
+            );
+        })
+    );
+});
+
 self.addEventListener('fetch', (e) => {
     const request = e.request;
     const url = new URL(request.url);

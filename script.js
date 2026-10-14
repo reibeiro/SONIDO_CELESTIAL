@@ -33,65 +33,88 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function fetchAlbumArt(artist, title) {
-        if (artist === 'Radio Sonido Celestial' || title === 'En Vivo') {
-            playerContainer.style.setProperty('--album-art', 'none');
-            if (miniArt) miniArt.src = 'logo.png';
-            return;
-        }
+    // Set fallback on miniArt load errors
+    if (miniArt) {
+        miniArt.onerror = function () {
+            this.onerror = null;
+            this.src = 'logo.png';
+        };
+    }
 
-        const query = encodeURIComponent(artist + ' ' + title);
-        const cached = albumArtCache.get(query);
-        if (cached) {
-                playerContainer.style.setProperty('--album-art', `url('${cached}')`);
-                if (miniArt) miniArt.src = cached;
-                updateLastHistoryArt(cached);
-                if ('mediaSession' in navigator && navigator.mediaSession.metadata) {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: navigator.mediaSession.metadata.title,
-                        artist: navigator.mediaSession.metadata.artist,
-                        artwork: [{ src: cached, sizes: '600x600', type: 'image/png' }]
-                    });
-                }
-                return;
+    function applyAlbumArt(artUrl) {
+        playerContainer.style.setProperty('--album-art', `url('${artUrl}')`);
+        if (miniArt) miniArt.src = artUrl;
+        if ('mediaSession' in navigator && navigator.mediaSession.metadata) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: navigator.mediaSession.metadata.title,
+                artist: navigator.mediaSession.metadata.artist,
+                artwork: [{ src: artUrl, sizes: '300x300', type: 'image/jpeg' }]
+            });
         }
+    }
 
-        fetch(`https://itunes.apple.com/search?term=${query}&media=music&limit=1`)
+    function applyDefaultArt() {
+        playerContainer.style.setProperty('--album-art', 'none');
+        if (miniArt) miniArt.src = 'logo.png';
+    }
+
+    function searchItunes(searchTerm) {
+        const query = encodeURIComponent(searchTerm);
+        return fetch(`https://itunes.apple.com/search?term=${query}&media=music&limit=1`)
             .then(res => {
-                if (!res.ok) throw new Error('iTunes API error: ' + res.status);
+                if (!res.ok) throw new Error('iTunes ' + res.status);
                 return res.json();
             })
             .then(data => {
-                let artUrl;
                 if (data.results && data.results.length > 0) {
-                    artUrl = data.results[0].artworkUrl100.replace('100x100', '600x600');
-                    playerContainer.style.setProperty('--album-art', `url('${artUrl}')`);
-                } else {
-                    playerContainer.style.setProperty('--album-art', 'none');
-                    artUrl = 'logo.png';
+                    return data.results[0].artworkUrl100.replace('100x100', '300x300');
                 }
-                if (artUrl !== 'logo.png') albumArtCache.set(query, artUrl);
-                if (miniArt) miniArt.src = artUrl;
-                updateLastHistoryArt(artUrl);
-                if ('mediaSession' in navigator && navigator.mediaSession.metadata) {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: navigator.mediaSession.metadata.title,
-                        artist: navigator.mediaSession.metadata.artist,
-                        artwork: [{ src: artUrl, sizes: '600x600', type: 'image/png' }]
-                    });
+                return null;
+            });
+    }
+
+    function fetchAlbumArt(artist, title, onResolved) {
+        if (artist === 'Radio Sonido Celestial' || title === 'En Vivo' || !title) {
+            applyDefaultArt();
+            if (onResolved) onResolved('logo.png');
+            return;
+        }
+
+        const cacheKey = artist + '|' + title;
+        const cached = albumArtCache.get(cacheKey);
+        if (cached) {
+            applyAlbumArt(cached);
+            if (onResolved) onResolved(cached);
+            return;
+        }
+
+        // Strategy 1: artist + title combined
+        searchItunes(artist + ' ' + title)
+            .then(artUrl => {
+                if (artUrl) return artUrl;
+                // Strategy 2: title only
+                return searchItunes(title);
+            })
+            .then(artUrl => {
+                if (artUrl) return artUrl;
+                // Strategy 3: artist only
+                return searchItunes(artist);
+            })
+            .then(artUrl => {
+                if (artUrl) {
+                    albumArtCache.set(cacheKey, artUrl);
+                    applyAlbumArt(artUrl);
+                    if (onResolved) onResolved(artUrl);
+                } else {
+                    console.warn('No album art found for:', artist, '-', title);
+                    applyDefaultArt();
+                    if (onResolved) onResolved('logo.png');
                 }
             })
-            .catch(() => {
-                playerContainer.style.setProperty('--album-art', 'none');
-                if (miniArt) miniArt.src = 'logo.png';
-                updateLastHistoryArt('logo.png');
-                if ('mediaSession' in navigator && navigator.mediaSession.metadata) {
-                    navigator.mediaSession.metadata = new MediaMetadata({
-                        title: navigator.mediaSession.metadata.title,
-                        artist: navigator.mediaSession.metadata.artist,
-                        artwork: [{ src: 'logo.png', sizes: '600x600', type: 'image/png' }]
-                    });
-                }
+            .catch(err => {
+                console.error('Album art fetch error:', err);
+                applyDefaultArt();
+                if (onResolved) onResolved('logo.png');
             });
     }
 
@@ -103,46 +126,40 @@ document.addEventListener('DOMContentLoaded', () => {
             let artist = 'Radio Sonido Celestial';
             let title = data.streamTitle;
 
-            // Zeno often sends "Artist - Title" in streamTitle
-            const parts = data.streamTitle.split('-');
-            if (parts.length > 1) {
-                artist = parts[0].trim();
-                title = parts.slice(1).join('-').trim();
-            } else {
-                title = data.streamTitle;
+            // Zeno sends "Artist - Title" in streamTitle
+            const dashIdx = data.streamTitle.indexOf(' - ');
+            if (dashIdx > 0) {
+                artist = data.streamTitle.substring(0, dashIdx).trim();
+                title = data.streamTitle.substring(dashIdx + 3).trim();
             }
 
             artistNameEl.textContent = artist;
             songTitleEl.textContent = title;
 
-            // Always fetch album art for background
-            if (data.image) {
-                playerContainer.style.setProperty('--album-art', `url('${data.image}')`);
-                if (miniArt) miniArt.src = data.image;
-            } else {
-                fetchAlbumArt(artist, title);
-            }
-
-            // Save to history
-            addToHistory(artist, title, data.image || 'logo.png');
-
-            // Update Media Session with real artwork
-            const msArtUrl = data.image || (miniArt ? miniArt.src : 'logo.png');
+            // Set initial Media Session
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: title,
                     artist: artist,
-                    artwork: [
-                        { src: msArtUrl, sizes: '600x600', type: 'image/png' }
-                    ]
+                    artwork: [{ src: 'logo.png', sizes: '300x300', type: 'image/jpeg' }]
                 });
             }
 
-            // Notify Android native bridge with album art URL
-            const artUrlForAndroid = data.image || (miniArt ? miniArt.src : '');
-            try {
-                if (isAndroid()) Android.updateMetadata(title, artist, artUrlForAndroid);
-            } catch (e) {}
+            // Callback: save to history + notify Android AFTER art resolves
+            const onArtResolved = (artUrl) => {
+                addToHistory(artist, title, artUrl);
+                try {
+                    if (isAndroid()) Android.updateMetadata(title, artist, artUrl === 'logo.png' ? '' : artUrl);
+                } catch (e) {}
+            };
+
+            // Fetch album art, then save history with real art
+            if (data.image) {
+                applyAlbumArt(data.image);
+                onArtResolved(data.image);
+            } else {
+                fetchAlbumArt(artist, title, onArtResolved);
+            }
         }
     }
 

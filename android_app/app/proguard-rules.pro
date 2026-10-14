@@ -18,3 +18,6 @@
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
+
+# Kotlin coroutines spilling (required by R8)
+-dontwarn kotlin.coroutines.jvm.internal.SpillingKt

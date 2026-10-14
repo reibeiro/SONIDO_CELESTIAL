@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "400869614864",
+    "project_id": "sonido-celestal",
+    "storage_bucket": "sonido-celestal.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400869614864:android:7aa6f47794a82073f8f195",
+        "android_client_info": {
+          "package_name": "com.sonidocelestial.radio"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "400869614864-d1p1vuus96nl5oarjvs546vpkleb7deu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDX9KHf6LZ1QXgTdyafWUhrEwthfEcuZEo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "400869614864-d1p1vuus96nl5oarjvs546vpkleb7deu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

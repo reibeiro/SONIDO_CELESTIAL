@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.webkit.JavascriptInterface
+import java.lang.StringBuilder
+import java.util.Locale
 
 class RadioInterface(private val context: Context) {
 
@@ -36,6 +38,20 @@ class RadioInterface(private val context: Context) {
     @JavascriptInterface
     fun getVolume(): Double {
         return AudioService.instance?.getVolume()?.toDouble() ?: 0.8
+    }
+
+    @JavascriptInterface
+    fun getFftData(): String {
+        val bands = VisualizerAudioProcessor.bandsData
+        val sb = StringBuilder(256)
+        sb.append('[')
+        for (i in bands.indices) {
+            if (i > 0) sb.append(',')
+            val rounded = ((bands[i] * 1000).toInt()) / 1000.0f
+            sb.append(rounded)
+        }
+        sb.append(']')
+        return sb.toString()
     }
 
     @JvmOverloads
