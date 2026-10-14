@@ -3,7 +3,7 @@
 <!-- ========================================== -->
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-1.0.0-blue?style=for-the-badge" alt="Versión">
+  <img src="https://img.shields.io/badge/versión-1.7.0-blue?style=for-the-badge" alt="Versión">
   <img src="https://img.shields.io/badge/Android-API%2021%2B-brightgreen?style=for-the-badge&logo=android" alt="Android">
   <img src="https://img.shields.io/badge/licencia-MIT-green?style=for-the-badge" alt="Licencia">
   <img src="https://img.shields.io/badge/estable-sí-success?style=for-the-badge" alt="Estable">
