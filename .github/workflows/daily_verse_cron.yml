@@ -1,0 +1,27 @@
+name: Despacho Automatizado Versiculo del Dia
+
+on:
+  schedule:
+    # 8:00 AM Colombia (13:00 UTC) y 8:00 PM Colombia (01:00 UTC del día siguiente)
+    - cron: '0 13,1 * * *'
+  workflow_dispatch:
+
+jobs:
+  dispatch_verse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Dependencies
+        run: npm install firebase-admin node-fetch@2
+
+      - name: Run Daily Verse Script
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node cron_daily_verse.js
