@@ -1057,12 +1057,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Admin Verse Suggest Handler
+    // Admin Verse Suggest Handler (30+ Promesas RVR1960)
     const adminVerseSuggestBtn = document.getElementById('admin-verse-suggest-btn');
     if (adminVerseSuggestBtn) {
         adminVerseSuggestBtn.addEventListener('click', () => {
             const refInput = document.getElementById('admin-verse-ref');
             const textInput = document.getElementById('admin-verse-text');
+
+            const bibleBankRVR = [
+                { ref: 'Filipenses 4:13', text: 'Todo lo puedo en Cristo que me fortalece.' },
+                { ref: 'Juan 3:16', text: 'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree no se pierda, mas tenga vida eterna.' },
+                { ref: 'Salmos 23:1', text: 'El Señor es mi pastor; nada me faltará.' },
+                { ref: 'Salmos 27:1', text: 'Jehová es mi luz y mi salvación; ¿de quién temeré? Jehová es la fortaleza de mi vida; ¿de quién he de atemorizarme?' },
+                { ref: 'Josué 1:9', text: 'Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo en dondequiera que vayas.' },
+                { ref: 'Jeremías 29:11', text: 'Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.' },
+                { ref: 'Proverbios 3:5-6', text: 'Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia. Reconócelo en todos tus caminos, y él enderezará tus veredas.' },
+                { ref: 'Isaías 40:31', text: 'Pero los que esperan a Jehová tendrán nuevas fuerzas; levantarán alas como las águilas; correrán, y no se cansarán; caminarán, y no se fatigarán.' },
+                { ref: 'Romanos 8:28', text: 'Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien, esto es, a los que conforme a su propósito son llamados.' },
+                { ref: 'Salmos 46:1', text: 'Dios es nuestro amparo y fortaleza, nuestro pronto auxilio en las tribulaciones.' },
+                { ref: 'Romanos 12:2', text: 'No os conforméis a este siglo, sino transformaos por medio de la renovación de vuestro entendimiento, para que comprobéis cuál sea la buena voluntad de Dios, agradable y perfecta.' },
+                { ref: 'Mateo 11:28', text: 'Venid a mí todos los que estáis trabajados y cargados, y yo os haré descansar.' },
+                { ref: 'Salmos 121:1-2', text: 'Alzaré mis ojos a los montes; ¿De dónde vendrá mi socorro? Mi socorro viene de Jehová, Que hizo los cielos y la tierra.' },
+                { ref: 'Isaías 41:10', text: 'No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios que te esfuerzo; siempre te ayudaré, siempre te sustentaré con la diestra de mi justicia.' },
+                { ref: 'Hebreos 11:1', text: 'Es, pues, la fe la certeza de lo que se espera, la convicción de lo que no se ve.' },
+                { ref: 'Proverbios 16:3', text: 'Encomienda a Jehová tus obras, y tus pensamientos serán afirmados.' },
+                { ref: 'Salmos 91:1-2', text: 'El que habita al abrigo del Altísimo morará bajo la sombra del Omnipotente. Diré yo a Jehová: Esperanza mía, y castillo mío; Mi Dios, en quien confiaré.' },
+                { ref: '2 Timoteo 1:7', text: 'Porque no nos ha dado Dios espíritu de cobardía, sino de poder, de amor y de dominio propio.' },
+                { ref: 'Santiago 1:5', text: 'Y si alguno de vosotros tiene falta de sabiduría, pídala a Dios, el cual da a todos abundantemente y sin reproche, y le será dada.' },
+                { ref: 'Filipenses 4:6-7', text: 'Por nada estéis afanosos, sino sean conocidas vuestras peticiones delante de Dios en toda oración y ruego, con acción de gracias. Y la paz de Dios, que sobrepasa todo entendimiento, guardará vuestros corazones y vuestros pensamientos en Cristo Jesús.' },
+                { ref: 'Salmos 119:105', text: 'Lámpara es a mis pies tu palabra, y lumbrera a mi camino.' },
+                { ref: '1 Corintios 13:4-7', text: 'El amor es sufrido, es benigno; el amor no tiene envidia, el amor no es jactancioso, no se envanece; no hace nada indebido, no busca lo suyo, no se irrita, no guarda rencor.' },
+                { ref: 'Efesios 2:8-9', text: 'Porque por gracia sois salvos por medio de la fe; y esto no de vosotros, pues es don de Dios; no por obras, para que nadie se gloríe.' },
+                { ref: 'Mateo 6:33', text: 'Mas buscad primeramente el reino de Dios y su justicia, y todas estas cosas os serán añadidas.' },
+                { ref: 'Salmos 34:8', text: 'Gustad, y ved que es bueno Jehová; Dichoso el hombre que confía en él.' }
+            ];
 
             showToast('Buscando versículo inspirador...');
 
@@ -1079,14 +1107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch(() => {
-                    const fallback = [
-                        { ref: 'Filipenses 4:13', text: 'Todo lo puedo en Cristo que me fortalece.' },
-                        { ref: 'Juan 3:16', text: 'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito...' },
-                        { ref: 'Salmos 23:1', text: 'El Señor es mi pastor; nada me faltará.' },
-                        { ref: 'Salmos 27:1', text: 'Jehová es mi luz y mi salvación; ¿de quién temeré?' },
-                        { ref: 'Josué 1:5', text: 'No te dejaré, ni te desampararé.' }
-                    ];
-                    const randomItem = fallback[Math.floor(Math.random() * fallback.length)];
+                    const randomItem = bibleBankRVR[Math.floor(Math.random() * bibleBankRVR.length)];
                     if (refInput) refInput.value = randomItem.ref;
                     if (textInput) textInput.value = randomItem.text;
                     showToast('🎲 Versículo sugerido cargado');
