@@ -75,6 +75,15 @@ async function dispatchDailyVerse() {
   const pushTitle = `📖 Versículo del Día: ${verseRef}`;
   const pushBody = verseText;
 
+  // 1. Actualizar el documento unificado settings/daily_verse en Firestore (Fuente Única de la Verdad)
+  await db.collection('settings').doc('daily_verse').set({
+    ref: verseRef,
+    text: verseText,
+    title: pushTitle,
+    updatedAt: new Date().toISOString()
+  });
+  console.log("📖 Documento settings/daily_verse actualizado en Firestore con la cita RVR1960:", verseRef);
+
   // 2. Guardar en Firestore (Colección notification_requests)
   const docRef = await db.collection('notification_requests').add({
     title: pushTitle,

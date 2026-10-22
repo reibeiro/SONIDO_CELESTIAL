@@ -1110,6 +1110,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const title = `📖 Versículo del Día: ${ref}`;
                 const body = text;
 
+                // 1. Actualizar el documento unificado settings/daily_verse en Firestore
+                db.collection('settings').doc('daily_verse').set({
+                    ref: ref,
+                    text: text,
+                    title: title,
+                    updatedAt: new Date().toISOString()
+                });
+
+                // 2. Guardar en el historial de solicitudes de aviso
                 db.collection('notification_requests').add({
                     title: title,
                     body: body,
@@ -1118,13 +1127,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     sentBy: auth.currentUser ? auth.currentUser.email : 'admin',
                     createdAt: new Date().toISOString()
                 }).then(() => {
-                    showToast('📖 ¡Versículo del día enviado a todos!');
+                    showToast('📖 ¡Versículo publicado y enviado a todos!');
                     if (document.getElementById('admin-verse-ref')) document.getElementById('admin-verse-ref').value = '';
                     if (document.getElementById('admin-verse-text')) document.getElementById('admin-verse-text').value = '';
                 }).catch(err => {
                     showToast('Error al enviar: ' + err.message);
                 });
 
+                // 3. Despachar FCM Push a todos
                 sendFcmPushToAllListeners(title, body, 'bible');
             } else {
                 showToast('Debes iniciar sesión como Admin');
@@ -1959,11 +1969,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Versículo del Día Sincronizado (Firestore Realtime + API RVR1960) ---
     (function() {
         var elText = document.querySelector('.bible-verse-text');
         var elRef = document.querySelector('.bible-verse-ref');
         if (!elText || !elRef) return;
 
+        // 1. Escuchar Firestore para mantener la pestaña Biblia 100% sincronizada con las notificaciones
+        if (typeof db !== 'undefined' && db) {
+            db.collection('settings').doc('daily_verse').onSnapshot(function(doc) {
+                if (doc && doc.exists) {
+                    var data = doc.data();
+                    if (data && data.text && data.ref) {
+                        elText.textContent = '\u201C' + data.text + '\u201D';
+                        elRef.textContent = data.ref;
+                    }
+                }
+            }, function(err) {
+                console.warn('Daily verse listener notice:', err);
+            });
+        }
+
+        // 2. Carga inicial por defecto si Firestore aún no tiene documento
         var fallback = [
             { text: 'Todo lo puedo en Cristo que me fortalece.', ref: 'Filipenses 4:13' },
             { text: 'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree no se pierda, sino que tenga vida eterna.', ref: 'Juan 3:16' },
@@ -1977,6 +2004,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elText.textContent = '\u201C' + fallback[idx].text + '\u201D';
         elRef.textContent = fallback[idx].ref;
 
+        // 3. Consulta a la API pública RVR1960 en vivo
         fetch('https://bible-api.com/?random=verse&translation=rv1960')
             .then(function(r) {
                 if (!r.ok) throw new Error('Bible API error: ' + r.status);
