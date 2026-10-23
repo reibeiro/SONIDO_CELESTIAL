@@ -11,10 +11,57 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' https: data:; media-src 'self' https:; connect-src 'self' https: https://bible-api.com; manifest-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' https: data:; media-src 'self' https:; connect-src 'self' https: https://bible-api.com https://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://firestore.googleapis.com; manifest-src 'self';">
 </head>
 
 <body>
+    <!-- Side Drawer Navigation Menu -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <aside id="side-drawer" class="side-drawer">
+        <div class="drawer-header">
+            <div class="drawer-brand">
+                <img src="logo.png" alt="Logo Radio" class="drawer-logo">
+                <div class="drawer-title-group">
+                    <div class="drawer-app-title">Sonido Celestial</div>
+                    <div class="drawer-app-slogan">Radio en Vivo 24/7</div>
+                </div>
+            </div>
+            <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Cerrar menú">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="drawer-body">
+            <div class="drawer-nav-list">
+                <button id="drawer-admin-btn" class="drawer-menu-item highlight-item" type="button">
+                    <i class="fas fa-user-shield"></i>
+                    <span id="drawer-admin-label">Acceso Administrador</span>
+                </button>
+                <button id="drawer-schedule-btn" class="drawer-menu-item" type="button">
+                    <i class="fas fa-calendar-days"></i>
+                    <span>Programación Oficial</span>
+                </button>
+                <a href="https://wa.me/?text=Hola%20Radio%20Sonido%20Celestial" target="_blank" class="drawer-menu-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Contacto WhatsApp</span>
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61564215665120" target="_blank" class="drawer-menu-item">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Facebook Oficial</span>
+                </a>
+                <a href="https://reibeiro.github.io/SONIDO_CELESTIAL/privacy-policy.html" target="_blank" class="drawer-menu-item">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Política de Privacidad</span>
+                </a>
+            </div>
+
+            <div class="drawer-footer">
+                <div class="drawer-version">Versión 1.7.2</div>
+                <div class="drawer-copy">Música y Palabra que edifica tu vida</div>
+            </div>
+        </div>
+    </aside>
+
     <div class="background-overlay"></div>
     <canvas id="space-canvas"></canvas>
 
@@ -22,23 +69,17 @@
         <!-- Main Player UI -->
         <div class="header-bar">
             <div class="header-brand">
-                <span class="brand-icon">✦</span>
+                <button id="drawer-toggle-btn" class="drawer-toggle-btn" aria-label="Menú principal" title="Menú principal">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <span class="brand-name">Sonido Celestial</span>
             </div>
             <div class="header-right">
-                <button id="history-btn" class="history-toggle" aria-label="Historial">
-                    <i class="far fa-bell"></i>
-                </button>
+            <img src="logo.png" alt="Logo Sonido Celestial" class="header-app-logo">
             </div>
         </div>
 
         <div class="player-content" id="player-content">
-            <div class="art-container">
-                <div class="album-art-wrapper">
-                    <img src="logo.png" alt="Radio Logo" id="radio-logo">
-                </div>
-            </div>
-
             <div class="now-playing-card" id="now-playing-card">
                 <img src="logo.png" id="mini-art" alt="Album Art">
                 <div class="now-playing-info">
@@ -55,25 +96,39 @@
             </div>
 
         <div class="visualizer-container">
-            <div class="visualizer-track" id="visualizer-track"></div>
+            <button id="vis-mode-btn" class="vis-mode-btn" type="button" aria-label="Cambiar modo de ecualizador" title="Cambiar modo de ecualizador">
+                <i class="fas fa-chart-simple"></i>
+            </button>
+            <canvas id="visualizer-canvas" class="visualizer-canvas"></canvas>
         </div>
 
-            <div class="social-row">
-                <a href="https://www.facebook.com/profile.php?id=61564215665120" target="_blank"
-                    class="social-link" aria-label="Visit Facebook">
-                    <i class="fab fa-facebook-f"></i>
-                    <span class="social-label">Facebook</span>
-                </a>
-                <a href="https://wa.me/573145377834" target="_blank" class="social-link"
-                    aria-label="Chat on WhatsApp">
-                    <i class="fab fa-whatsapp"></i>
-                    <span class="social-label">WhatsApp</span>
-                </a>
-                <a href="https://wa.me/?text=Escucha%20Radio%20Sonido%20Celestial" target="_blank" class="social-link"
-                    aria-label="Compartir Radio Sonido Celestial">
-                    <i class="fas fa-share-nodes"></i>
-                    <span class="social-label">Compartir</span>
-                </a>
+        <!-- Main Action Grid (High Visibility Listener Toolbox) -->
+        <div class="main-action-grid">
+            <button id="sleep-btn" class="action-card-btn" type="button" aria-label="Temporizador de apagado" title="Temporizador de apagado">
+                <i class="fas fa-bed"></i>
+                <span>Sleep</span>
+                <span id="sleep-badge" class="sleep-badge" style="display:none;"></span>
+            </button>
+            <button id="notifications-btn" class="action-card-btn" type="button" aria-label="Avisos Importantes" title="Avisos Importantes">
+                <i class="fas fa-bell"></i>
+                <span>Avisos</span>
+            </button>
+            <button id="quick-prayer-btn" class="action-card-btn" type="button" aria-label="Petición de Oración" title="Petición de Oración">
+                <i class="fas fa-hands-praying"></i>
+                <span>Oración</span>
+            </button>
+            <button id="quick-schedule-btn" class="action-card-btn" type="button" aria-label="Programación" title="Programación">
+                <i class="fas fa-calendar-days"></i>
+                <span>Programación</span>
+            </button>
+        </div>
+
+            <div id="live-video-banner" class="live-video-banner" style="display: none;">
+                <div class="live-video-badge"><span class="pulse-dot"></span> TRANSMITIENDO VIDEO EN VIVO</div>
+                <div id="live-video-title" class="live-video-title">Transmisión en Vivo</div>
+                <button id="watch-video-btn" class="watch-video-btn" type="button">
+                    <i class="fas fa-play"></i> Ver Video en Vivo
+                </button>
             </div>
 
             <div class="controls-row">
@@ -87,6 +142,23 @@
                 <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
                 <i class="fas fa-volume-up"></i>
             </div>
+
+            <div class="social-row">
+                <a href="https://www.facebook.com/profile.php?id=61564215665120" target="_blank"
+                    class="social-link" aria-label="Visitar Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                    <span class="social-label">Facebook</span>
+                </a>
+                <a href="https://www.youtube.com/@SonidoCelestialRadio/live" target="_blank"
+                    class="social-link yt-social-link" aria-label="Ver Canal de YouTube">
+                    <i class="fab fa-youtube"></i>
+                    <span class="social-label">YouTube</span>
+                </a>
+                <button id="share-app-btn" class="social-link share-social-btn" type="button" aria-label="Compartir App" title="Compartir App en Google Play">
+                    <i class="fas fa-share-nodes"></i>
+                    <span class="social-label">Compartir</span>
+                </button>
+            </div>
         </div>
 
         <!-- Bible Section -->
@@ -96,10 +168,57 @@
                 <div class="bible-verse-label">Versículo del Día</div>
                 <div class="bible-verse-text">"Todo lo puedo en Cristo que me fortalece."</div>
                 <div class="bible-verse-ref">Filipenses 4:13</div>
+
+                <div class="verse-actions-row">
+                    <button id="copy-verse-btn" class="verse-action-btn" type="button" aria-label="Copiar Versículo">
+                        <i class="fas fa-copy"></i>
+                        <span>Copiar</span>
+                    </button>
+                    <button id="share-verse-btn" class="verse-action-btn primary-verse-btn" type="button" aria-label="Compartir Versículo">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Compartir</span>
+                    </button>
+                </div>
             </div>
         </div>
 
-            <audio id="audioPlayer" preload="none"></audio>
+        <!-- Info & Privacy Section -->
+        <div class="info-section" id="info-section">
+            <div class="info-card">
+                <div class="info-app-header">
+                    <img src="logo.png" alt="Radio Logo" class="info-app-logo">
+                    <div class="info-app-title">Radio Sonido Celestial</div>
+                    <div class="info-app-slogan">Música y Palabra que edifica tu vida</div>
+                    <div class="info-app-version">Versión 1.7.2</div>
+                </div>
+
+                <div class="info-divider"></div>
+
+                <div class="info-actions">
+                    <a href="https://reibeiro.github.io/SONIDO_CELESTIAL/privacy-policy.html" target="_blank" class="info-btn primary-info-btn">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Política de Privacidad</span>
+                        <i class="fas fa-arrow-up-right-from-square info-btn-arrow"></i>
+                    </a>
+
+                    <a href="https://wa.me/573145377834" target="_blank" class="info-btn secondary-info-btn">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>Contacto por WhatsApp</span>
+                    </a>
+
+                    <a href="https://www.facebook.com/profile.php?id=61564215665120" target="_blank" class="info-btn secondary-info-btn">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Síguenos en Facebook</span>
+                    </a>
+                </div>
+
+                <div class="info-footer">
+                    <span>© 2026 Radio Sonido Celestial. Todos los derechos reservados.</span>
+                </div>
+            </div>
+        </div>
+
+        <audio id="audioPlayer" preload="none"></audio>
 
         <nav class="bottom-nav" aria-label="Navegacion principal">
             <button class="nav-item active" type="button" aria-label="Inicio">
@@ -114,30 +233,360 @@
                 <i class="fas fa-clock-rotate-left nav-icon" aria-hidden="true"></i>
                 <span>Historial</span>
             </button>
-            <!-- Botón de Ajustes oculto temporalmente -->
-            <!--
-            <button class="nav-item" type="button" aria-label="Ajustes">
-                <i class="fas fa-gear nav-icon" aria-hidden="true"></i>
-                <span>Ajustes</span>
+            <button class="nav-item" type="button" aria-label="Información y Privacidad">
+                <i class="fas fa-circle-info nav-icon" aria-hidden="true"></i>
+                <span>Info</span>
             </button>
-            -->
         </nav>
 
-        <!-- History Panel -->
+        <!-- History Panel Modal -->
         <div id="history-overlay" class="history-overlay"></div>
         <div id="history-panel" class="history-panel">
             <div class="history-panel-header">
-                <span class="history-panel-title" id="history-panel-title">🕒 Historial reciente</span>
-                <button id="history-close" class="history-close" aria-label="Cerrar historial">
-                    <i class="fas fa-times"></i>
-                </button>
+                <span class="history-panel-title" id="history-panel-title"><i class="fas fa-clock-rotate-left"></i> Historial Reciente</span>
+                <div class="history-header-actions">
+                    <button id="clear-history-btn" class="clear-history-btn" type="button" title="Limpiar historial">
+                        <i class="fas fa-trash-can"></i> Limpiar
+                    </button>
+                    <button id="history-close" class="history-close" aria-label="Cerrar historial">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
             <div class="history-list" id="history-list">
                 <!-- Populated by JS -->
             </div>
         </div>
+
+        <!-- Prayer Request Modal -->
+        <div id="prayer-overlay" class="prayer-overlay"></div>
+        <div id="prayer-modal" class="prayer-modal">
+            <div class="prayer-modal-header">
+                <span class="prayer-modal-title"><i class="fas fa-hands-praying"></i> Petición de Oración</span>
+                <button id="prayer-close" class="prayer-close" aria-label="Cerrar modal de oración">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="prayer-modal-body">
+                <p class="prayer-modal-subtitle">Escribe tu motivo de oración y lo enviaremos directamente a nuestro equipo por WhatsApp.</p>
+
+                <div class="prayer-field">
+                    <label for="prayer-name"><i class="fas fa-user"></i> Tu Nombre (Opcional)</label>
+                    <input type="text" id="prayer-name" placeholder="Ej: María Rodríguez" autocomplete="name">
+                </div>
+
+                <div class="prayer-field">
+                    <label for="prayer-message"><i class="fas fa-heart"></i> Tu Petición de Oración</label>
+                    <textarea id="prayer-message" rows="4" placeholder="Escribe aquí por qué o por quién deseas que oremos..."></textarea>
+                </div>
+
+                <button id="prayer-send-btn" class="prayer-send-btn" type="button">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>Enviar por WhatsApp</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast Feedback Notification -->
+        <div id="toast-notification" class="toast-notification"></div>
+
+        <!-- Sleep Timer Modal -->
+        <div id="sleep-overlay" class="sleep-overlay"></div>
+        <div id="sleep-modal" class="sleep-modal">
+            <div class="sleep-modal-header">
+                <span class="sleep-modal-title"><i class="fas fa-moon"></i> Temporizador de Apagado</span>
+                <button id="sleep-close" class="sleep-close" aria-label="Cerrar temporizador">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="sleep-modal-body">
+                <div class="sleep-hero-art">
+                    <i class="fas fa-moon"></i>
+                </div>
+
+                <div id="sleep-status" class="sleep-status" style="display:none;">
+                    <div class="sleep-countdown-box">
+                        <span class="sleep-label">Radio se apagará en:</span>
+                        <div class="sleep-time-display">
+                            <i class="fas fa-stopwatch"></i>
+                            <div id="sleep-countdown" class="sleep-countdown">15:00</div>
+                        </div>
+                    </div>
+                    <button id="sleep-cancel-btn" class="sleep-cancel-btn" type="button">
+                        <i class="fas fa-power-off"></i> Desactivar Temporizador
+                    </button>
+                </div>
+
+                <p class="sleep-subtitle">Selecciona en cuánto tiempo deseas apagar automáticamente la radio:</p>
+
+                <div class="sleep-options-grid">
+                    <button class="sleep-option-card" data-minutes="15" type="button">
+                        <span class="sleep-card-num">15</span>
+                        <span class="sleep-card-unit">minutos</span>
+                    </button>
+                    <button class="sleep-option-card" data-minutes="30" type="button">
+                        <span class="sleep-card-num">30</span>
+                        <span class="sleep-card-unit">minutos</span>
+                    </button>
+                    <button class="sleep-option-card" data-minutes="45" type="button">
+                        <span class="sleep-card-num">45</span>
+                        <span class="sleep-card-unit">minutos</span>
+                    </button>
+                    <button class="sleep-option-card" data-minutes="60" type="button">
+                        <span class="sleep-card-num">60</span>
+                        <span class="sleep-card-unit">minutos</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Schedule Modal -->
+        <div id="schedule-overlay" class="schedule-overlay"></div>
+        <div id="schedule-modal" class="schedule-modal">
+            <div class="schedule-modal-header">
+                <span class="schedule-modal-title"><i class="fas fa-calendar-days"></i> Programación en Vivo</span>
+                <button id="schedule-close" class="schedule-close" aria-label="Cerrar programación">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="schedule-modal-body">
+                <div id="admin-schedule-bar" class="admin-schedule-bar" style="display:none;">
+                    <span class="admin-badge"><i class="fas fa-unlock"></i> Modo Administrador</span>
+                    <button id="add-program-btn" class="add-program-btn" type="button">
+                        <i class="fas fa-plus"></i> Agregar
+                    </button>
+                </div>
+                <div class="schedule-days-nav">
+                    <button class="day-tab-btn active" data-day="weekdays" type="button">Lun - Vie</button>
+                    <button class="day-tab-btn" data-day="saturday" type="button">Sábado</button>
+                    <button class="day-tab-btn" data-day="sunday" type="button">Domingo</button>
+                </div>
+                <div id="schedule-list" class="schedule-list">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications Modal (Avisos Importantes) -->
+        <div id="notifications-overlay" class="notifications-overlay"></div>
+        <div id="notifications-modal" class="notifications-modal">
+            <div class="notifications-header">
+                <span class="notifications-title"><i class="fas fa-bullhorn"></i> Avisos Importantes</span>
+                <div class="notifications-header-actions">
+                    <button id="admin-clear-notifications-btn" class="admin-clear-notifications-btn" style="display: none;" title="Limpiar todos los avisos">
+                        <i class="fas fa-trash-can"></i>
+                    </button>
+                    <button id="notifications-close" class="notifications-close" aria-label="Cerrar avisos">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="notifications-body">
+                <div id="notifications-list" class="notifications-list">
+                    <div class="notifications-loading">
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        <p>Cargando avisos recientes...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Login Modal -->
+        <div id="admin-login-overlay" class="admin-login-overlay"></div>
+        <div id="admin-login-modal" class="admin-login-modal">
+            <div class="admin-login-header">
+                <span class="admin-login-title"><i class="fas fa-user-gear"></i> Panel Administrador</span>
+                <button id="admin-login-close" class="admin-login-close" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-login-body">
+                <div id="admin-logged-out-view">
+                    <p class="admin-login-subtitle">Ingresa tus credenciales para editar la programación en vivo de la radio.</p>
+                    <div class="admin-field">
+                        <label for="admin-email"><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                        <input type="email" id="admin-email" placeholder="admin@sonidocelestial.com" autocomplete="email">
+                    </div>
+                    <div class="admin-field">
+                        <label for="admin-password"><i class="fas fa-key"></i> Contraseña</label>
+                        <input type="password" id="admin-password" placeholder="••••••••">
+                    </div>
+                    <button id="admin-login-submit-btn" class="admin-login-submit-btn" type="button">
+                        <i class="fas fa-right-to-bracket"></i>
+                        <span>Iniciar Sesión Admin</span>
+                    </button>
+                </div>
+
+                <div id="admin-logged-in-view" style="display: none;">
+                    <div class="admin-profile-badge">
+                        <i class="fas fa-circle-check"></i>
+                        <div>
+                            <div class="admin-profile-title">Sesión Administrador Activa</div>
+                            <div id="admin-profile-email" class="admin-profile-email">admin@sonidocelestial.com</div>
+                        </div>
+                    </div>
+
+                    <div class="admin-video-card">
+                        <div class="admin-video-card-title"><i class="fas fa-video"></i> Transmisión de Video en Vivo</div>
+                        <div class="admin-field">
+                            <label for="admin-video-toggle"><i class="fas fa-toggle-on"></i> Estado de Video</label>
+                            <select id="admin-video-toggle" class="edit-select">
+                                <option value="off">⏹️ Desactivado (Solo Audio)</option>
+                                <option value="on">🔴 TRANSMITIENDO VIDEO EN VIVO</option>
+                            </select>
+                        </div>
+                        <div class="admin-field">
+                            <label for="admin-video-platform"><i class="fas fa-tv"></i> Plataforma</label>
+                            <select id="admin-video-platform" class="edit-select">
+                                <option value="youtube">🔴 YouTube Live (Incrustado)</option>
+                                <option value="facebook">🔵 Facebook Live (Apertura Nativa)</option>
+                            </select>
+                        </div>
+                        <div class="admin-field">
+                            <label for="admin-video-id"><i class="fas fa-link"></i> Enlace o ID de YouTube / Facebook</label>
+                            <input type="text" id="admin-video-id" placeholder="Ej: https://youtube.com/watch?v=... o enlace FB">
+                        </div>
+                        <div class="admin-field">
+                            <label for="admin-video-title"><i class="fas fa-heading"></i> Título del Video</label>
+                            <input type="text" id="admin-video-title" placeholder="Ej: Culto de Adoración en Vivo">
+                        </div>
+                        <button id="save-video-settings-btn" class="save-video-settings-btn" type="button">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                            <span>Publicar Estado de Video</span>
+                        </button>
+                    </div>
+
+                    <div class="admin-push-card">
+                        <div class="admin-push-card-title"><i class="fas fa-paper-plane"></i> Enviar Notificación Push Masiva</div>
+                        <div class="admin-field">
+                            <label for="push-title"><i class="fas fa-heading"></i> Título del Mensaje</label>
+                            <input type="text" id="push-title" placeholder="Ej: 🔴 ¡Estamos en Vivo!">
+                        </div>
+                        <div class="admin-field">
+                            <label for="push-body"><i class="fas fa-message"></i> Mensaje de la Notificación</label>
+                            <textarea id="push-body" rows="3" class="edit-textarea" placeholder="Ej: Únete al culto de adoración en directo ahora mismo."></textarea>
+                        </div>
+                        <button id="send-push-btn" class="send-push-btn" type="button">
+                            <i class="fas fa-bell"></i>
+                            <span>Enviar Notificación a Todos</span>
+                        </button>
+                    </div>
+
+                    <div class="admin-verse-card">
+                        <div class="admin-verse-card-title"><i class="fas fa-book-bible"></i> Enviar Versículo del Día</div>
+                        <div class="admin-field">
+                            <label for="admin-verse-ref"><i class="fas fa-bookmark"></i> Cita Bíblica</label>
+                            <input type="text" id="admin-verse-ref" placeholder="Ej: Filipenses 4:13">
+                        </div>
+                        <div class="admin-field">
+                            <label for="admin-verse-text"><i class="fas fa-quote-left"></i> Texto del Versículo</label>
+                            <textarea id="admin-verse-text" rows="3" class="edit-textarea" placeholder="Ej: Todo lo puedo en Cristo que me fortalece."></textarea>
+                        </div>
+                        <div class="admin-verse-btn-row">
+                            <button id="admin-verse-suggest-btn" class="admin-verse-suggest-btn" type="button">
+                                <i class="fas fa-dice"></i> Sugerir Aleatorio
+                            </button>
+                            <button id="admin-verse-send-btn" class="admin-verse-send-btn" type="button">
+                                <i class="fas fa-paper-plane"></i> Enviar Versículo
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="admin-login-subtitle">También puedes agregar, modificar o eliminar programas de la sección de Programación.</p>
+                    <button id="admin-logout-btn" class="admin-logout-btn" type="button">
+                        <i class="fas fa-right-from-bracket"></i>
+                        <span>Cerrar Sesión Admin</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit/Add Program Modal -->
+        <div id="edit-program-overlay" class="edit-program-overlay"></div>
+        <div id="edit-program-modal" class="edit-program-modal">
+            <div class="edit-program-header">
+                <span id="edit-program-title" class="edit-program-title"><i class="fas fa-pen-to-square"></i> Programa</span>
+                <button id="edit-program-close" class="edit-program-close" aria-label="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="edit-program-body">
+                <div class="edit-time-row">
+                    <div class="edit-field">
+                        <label for="prog-start"><i class="fas fa-clock"></i> Hora Inicio</label>
+                        <input type="text" id="prog-start" placeholder="06:00">
+                    </div>
+                    <div class="edit-field">
+                        <label for="prog-end"><i class="fas fa-clock"></i> Hora Fin</label>
+                        <input type="text" id="prog-end" placeholder="08:00">
+                    </div>
+                </div>
+                <div class="edit-field">
+                    <label for="prog-name"><i class="fas fa-radio"></i> Nombre del Programa</label>
+                    <input type="text" id="prog-name" placeholder="Ej: Amanecer con Dios">
+                </div>
+                <div class="edit-field">
+                    <label for="prog-host"><i class="fas fa-user"></i> Locutor / Descripción</label>
+                    <input type="text" id="prog-host" placeholder="Ej: Devocional & Alabanza">
+                </div>
+                <div class="edit-field">
+                    <label for="prog-icon"><i class="fas fa-icons"></i> Icono del Programa</label>
+                    <select id="prog-icon" class="edit-select">
+                        <option value="fa-sun">☀️ Sol (fa-sun)</option>
+                        <option value="fa-cloud-sun">🌤️ Mañana (fa-cloud-sun)</option>
+                        <option value="fa-book-open-reader">📖 Biblia (fa-book-open-reader)</option>
+                        <option value="fa-hands-praying">🙏 Oración (fa-hands-praying)</option>
+                        <option value="fa-radio">📻 Radio (fa-radio)</option>
+                        <option value="fa-house">🏠 Camino a Casa (fa-house)</option>
+                        <option value="fa-star">⭐ Adoración (fa-star)</option>
+                        <option value="fa-moon">🌙 Noche (fa-moon)</option>
+                        <option value="fa-church">⛪ Culto / Servicio (fa-church)</option>
+                        <option value="fa-heart">❤️ Bendición (fa-heart)</option>
+                        <option value="fa-music">🎶 Música (fa-music)</option>
+                        <option value="fa-trophy">🏆 Top Alabanzas (fa-trophy)</option>
+                    </select>
+                </div>
+                <button id="save-program-btn" class="save-program-btn" type="button">
+                    <i class="fas fa-cloud-arrow-up"></i>
+                    <span>Guardar Cambios</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Video Player Modal -->
+        <div id="video-overlay" class="video-overlay"></div>
+        <div id="video-modal" class="video-modal">
+            <div class="video-modal-header">
+                <span class="video-modal-title"><i class="fas fa-video"></i> Transmisión en Vivo</span>
+                <button id="video-close" class="video-close" aria-label="Cerrar video">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="video-modal-body">
+                <div id="video-container" class="video-container">
+                    <!-- Iframe injected dynamically by JS -->
+                </div>
+                <div class="video-modal-footer">
+                    <div id="video-title-display" class="video-title-display">Transmisión en Vivo</div>
+                    <div class="video-btn-group">
+                        <a id="video-external-btn" href="https://www.youtube.com/@SonidoCelestialRadio/live" target="_blank" class="video-ext-btn">
+                            <i class="fab fa-youtube"></i> Canal @SonidoCelestialRadio
+                        </a>
+                        <button id="video-audio-only-btn" class="video-audio-only-btn" type="button">
+                            <i class="fas fa-headphones"></i> Solo Audio
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
+    <!-- Firebase Compat SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+    <script src="firebase-config.js"></script>
     <script src="script.js"></script>
 </body>
 

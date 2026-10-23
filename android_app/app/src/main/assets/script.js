@@ -439,6 +439,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isOpen) renderHistory();
     }
 
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('¿Deseas borrar todo el historial de canciones escuchadas?')) {
+                localStorage.removeItem(HISTORY_KEY);
+                renderHistory();
+                showToast('Historial de canciones limpiado 🗑️');
+            }
+        });
+    }
+
     if (historyBtn) historyBtn.addEventListener('click', () => toggleHistory(true));
     if (bottomHistoryBtn) bottomHistoryBtn.addEventListener('click', () => toggleHistory(true));
     if (historyClose) historyClose.addEventListener('click', () => toggleHistory(false));
@@ -463,6 +474,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => prayerNameInput.focus(), 200);
         }
     }
+
+    const quickPrayerBtn = document.getElementById('quick-prayer-btn');
+    if (quickPrayerBtn) quickPrayerBtn.addEventListener('click', () => togglePrayerModal(true));
 
     if (prayerTriggerBtn) prayerTriggerBtn.addEventListener('click', () => togglePrayerModal(true));
     if (infoPrayerBtn) infoPrayerBtn.addEventListener('click', () => togglePrayerModal(true));
@@ -754,6 +768,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Side Drawer Navigation Menu ---
+    const drawerToggleBtn = document.getElementById('drawer-toggle-btn');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    const sideDrawer = document.getElementById('side-drawer');
+    const drawerCloseBtn = document.getElementById('drawer-close-btn');
+    const drawerAdminBtn = document.getElementById('drawer-admin-btn');
+    const drawerAdminLabel = document.getElementById('drawer-admin-label');
+    const drawerScheduleBtn = document.getElementById('drawer-schedule-btn');
+
+    function toggleSideDrawer(open) {
+        if (!drawerOverlay || !sideDrawer) return;
+        const isOpen = open !== undefined ? open : !sideDrawer.classList.contains('active');
+        drawerOverlay.classList.toggle('active', isOpen);
+        sideDrawer.classList.toggle('active', isOpen);
+    }
+
+    if (drawerToggleBtn) drawerToggleBtn.addEventListener('click', () => toggleSideDrawer(true));
+    if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', () => toggleSideDrawer(false));
+    if (drawerOverlay) drawerOverlay.addEventListener('click', () => toggleSideDrawer(false));
+
+    if (drawerAdminBtn) {
+        drawerAdminBtn.addEventListener('click', () => {
+            toggleSideDrawer(false);
+            toggleAdminLoginModal(true);
+        });
+    }
+
+    if (drawerScheduleBtn) {
+        drawerScheduleBtn.addEventListener('click', () => {
+            toggleSideDrawer(false);
+            toggleScheduleModal(true);
+        });
+    }
+
     // Admin Auth State Listener
     if (typeof auth !== 'undefined' && auth) {
         auth.onAuthStateChanged(user => {
@@ -769,6 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (adminLoggedInView) adminLoggedInView.style.display = isAdmin ? 'block' : 'none';
             if (adminProfileEmail && user) adminProfileEmail.textContent = user.email;
             if (adminBtnLabel) adminBtnLabel.textContent = isAdmin ? 'Admin Activo 🔓' : 'Acceso Administrador';
+            if (drawerAdminLabel) drawerAdminLabel.textContent = isAdmin ? 'Admin Activo 🔓' : 'Acceso Administrador';
 
             renderSchedule(activeDayCategory);
             updateLiveVideoUI();
@@ -1199,6 +1248,9 @@ document.addEventListener('DOMContentLoaded', () => {
             renderSchedule(activeDayCategory);
         }
     }
+
+    const quickScheduleBtn = document.getElementById('quick-schedule-btn');
+    if (quickScheduleBtn) quickScheduleBtn.addEventListener('click', () => toggleScheduleModal(true));
 
     if (scheduleTriggerBtn) scheduleTriggerBtn.addEventListener('click', () => toggleScheduleModal(true));
     if (infoScheduleBtn) infoScheduleBtn.addEventListener('click', () => toggleScheduleModal(true));
@@ -1822,13 +1874,36 @@ document.addEventListener('DOMContentLoaded', () => {
     function resizeVisCanvas() {
         if (!visCanvas) return;
         visCanvas.width = visCanvas.clientWidth || 300;
-        visCanvas.height = visCanvas.clientHeight || 110;
+        visCanvas.height = visCanvas.clientHeight || 135;
     }
 
     if (visCanvas) {
         window.addEventListener('resize', resizeVisCanvas);
         resizeVisCanvas();
         drawSpectrum();
+    }
+
+    // --- Share App Button Handler (Google Play Store Direct Link) ---
+    const shareAppBtn = document.getElementById('share-app-btn');
+    if (shareAppBtn) {
+        shareAppBtn.addEventListener('click', () => {
+            const shareTitle = 'Radio Sonido Celestial 📻✨';
+            const shareText = '¡Descarga e instala la app oficial de Radio Sonido Celestial en Google Play Store!';
+            const shareUrl = 'https://play.google.com/store/apps/details?id=com.sonidocelestial.radio';
+
+            if (navigator.share) {
+                navigator.share({
+                    title: shareTitle,
+                    text: shareText,
+                    url: shareUrl
+                }).then(() => {
+                    showToast('¡Gracias por compartir nuestra app de Google Play! 🙏');
+                }).catch(() => {});
+            } else {
+                const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`;
+                window.open(waUrl, '_blank');
+            }
+        });
     }
 
     // --- Toast Notification Feedback ---
