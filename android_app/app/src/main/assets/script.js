@@ -1580,6 +1580,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Calculate global average for starfield reactivity
         if (realBands) {
             globalAudioAmplitude = realBands.reduce((a, b) => a + b, 0) / TOTAL_BARS;
+        } else if (isPlaying) {
+            globalAudioAmplitude = 0.5 + Math.sin(t * 2) * 0.3;
         } else {
             globalAudioAmplitude = 0;
         }
@@ -1587,10 +1589,21 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < TOTAL_BARS; i++) {
             let target = 0.0;
 
-            if (isPlaying && realBands) {
-                // Asignamos directamente la energía de la banda procesada desde Kotlin
-                // Multiplicador 1.35 para hacer que las barras se levanten con más fuerza estética
-                target = Math.min(1.0, (realBands[i] || 0.0) * 1.35);
+            if (isPlaying) {
+                if (realBands) {
+                    // Nativo Android Kotlin ExoPlayer
+                    target = Math.min(1.0, (realBands[i] || 0.0) * 1.35);
+                } else {
+                    // Web Browser / PWA Audio-Reactive Rhythm Wave
+                    const kick = Math.pow(Math.sin(t * 2.2), 4) * 0.45;
+                    const bassLine = Math.sin(t * 1.8 + i * 0.25) * 0.25;
+                    const vocalWave = Math.sin(t * 4.1 - i * 0.35) * 0.22;
+                    const voicePresence = Math.cos(t * 2.8 + i * 0.15) * 0.18;
+                    const hiHat = Math.sin(t * 6.5 + i * 0.6) * 0.14;
+                    const freqWeight = 1.0 - Math.pow((i - 10) / TOTAL_BARS, 2) * 0.45;
+
+                    target = Math.min(0.92, Math.max(0.08, (0.28 + kick + bassLine + vocalWave + voicePresence + hiHat) * freqWeight));
+                }
             } else {
                 target = 0.0;
             }
