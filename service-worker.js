@@ -1,4 +1,4 @@
-const CACHE_NAME = 'radio-sonido-celestial-v1';
+const CACHE_NAME = 'radio-sonido-celestial-v1.7.2';
 const LOCAL_ASSETS = [
     './',
     './index.html',
@@ -8,6 +8,7 @@ const LOCAL_ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
+    self.skipWaiting();
     e.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll(LOCAL_ASSETS);
@@ -15,28 +16,39 @@ self.addEventListener('install', (e) => {
     );
 });
 
+self.addEventListener('activate', (e) => {
+    e.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.map((key) => {
+                    if (key !== CACHE_NAME) {
+                        console.log('Clearing old cache:', key);
+                        return caches.delete(key);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim())
+    );
+});
+
 self.addEventListener('fetch', (e) => {
     const request = e.request;
     const url = new URL(request.url);
 
-    // CDN assets: network first, cache fallback
-    if (url.origin === 'https://cdnjs.cloudflare.com' || url.origin === 'https://fonts.googleapis.com' || url.origin === 'https://fonts.gstatic.com') {
+    // Network first strategy so web browsers always get the latest update!
+    if (request.method === 'GET') {
         e.respondWith(
             fetch(request)
                 .then((response) => {
-                    const cloned = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+                    if (response && response.status === 200 && response.type === 'basic') {
+                        const cloned = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+                    }
                     return response;
                 })
-                .catch(() => caches.match(request))
+                .catch(() => {
+                    return caches.match(request);
+                })
         );
-        return;
     }
-
-    // Local assets: cache first, network fallback
-    e.respondWith(
-        caches.match(request).then((response) => {
-            return response || fetch(request);
-        })
-    );
 });
