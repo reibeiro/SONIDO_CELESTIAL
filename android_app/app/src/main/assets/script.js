@@ -145,28 +145,51 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    function triggerVerticalSlideUp(title, artist) {
-        if (!songTitleEl || !artistNameEl) return;
+    let titleFlipTimer = null;
 
-        songTitleEl.classList.add('slide-up-exit');
-        artistNameEl.classList.add('slide-up-exit');
-
+    function animateTextChange(el, newText) {
+        if (!el) return;
+        el.classList.add('slide-up-exit');
         setTimeout(() => {
-            songTitleEl.textContent = title;
-            artistNameEl.textContent = artist;
-
-            songTitleEl.classList.remove('slide-up-exit');
-            artistNameEl.classList.remove('slide-up-exit');
-            songTitleEl.classList.add('slide-up-enter');
-            artistNameEl.classList.add('slide-up-enter');
-
-            void songTitleEl.offsetWidth;
-
+            el.textContent = newText;
+            el.classList.remove('slide-up-exit');
+            el.classList.add('slide-up-enter');
+            void el.offsetWidth;
             setTimeout(() => {
-                songTitleEl.classList.remove('slide-up-enter');
-                artistNameEl.classList.remove('slide-up-enter');
+                el.classList.remove('slide-up-enter');
             }, 30);
         }, 220);
+    }
+
+    function setupTitlePaging(title, artist) {
+        if (titleFlipTimer) {
+            clearInterval(titleFlipTimer);
+            titleFlipTimer = null;
+        }
+
+        if (title.length > 44) {
+            let splitIdx = title.indexOf(' - ', 25);
+            if (splitIdx === -1) splitIdx = title.indexOf(' (', 25);
+            if (splitIdx === -1) splitIdx = title.indexOf(' ', 35);
+            if (splitIdx === -1) splitIdx = 38;
+
+            const page1 = title.substring(0, splitIdx).trim();
+            const page2 = title.substring(splitIdx).replace(/^[\s\-\•\(\)]+/, '').trim();
+
+            const pages = [page1, page2];
+            let currentPage = 0;
+
+            animateTextChange(songTitleEl, pages[0]);
+            if (artistNameEl) animateTextChange(artistNameEl, artist);
+
+            titleFlipTimer = setInterval(() => {
+                currentPage = (currentPage + 1) % pages.length;
+                animateTextChange(songTitleEl, pages[currentPage]);
+            }, 5000);
+        } else {
+            animateTextChange(songTitleEl, title);
+            if (artistNameEl) animateTextChange(artistNameEl, artist);
+        }
     }
 
     function updateMetadata(data) {
@@ -184,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title = data.streamTitle.substring(dashIdx + 3).trim();
             }
 
-            triggerVerticalSlideUp(title, artist);
+            setupTitlePaging(title, artist);
 
             // Set initial Media Session
             if ('mediaSession' in navigator) {
