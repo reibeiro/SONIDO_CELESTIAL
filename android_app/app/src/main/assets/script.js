@@ -145,50 +145,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    let titleFlipTimer = null;
+    function applyMarqueeScroll(element, wrapper) {
+        if (!element || !wrapper) return;
 
-    function animateTextChange(el, newText) {
-        if (!el) return;
-        el.classList.add('slide-up-exit');
-        setTimeout(() => {
-            el.textContent = newText;
-            el.classList.remove('slide-up-exit');
-            el.classList.add('slide-up-enter');
-            void el.offsetWidth;
-            setTimeout(() => {
-                el.classList.remove('slide-up-enter');
-            }, 30);
-        }, 220);
-    }
+        element.classList.remove('scrolling');
+        const oldDup = element.querySelector('.marquee-dup');
+        if (oldDup) oldDup.remove();
 
-    function setupTitlePaging(title, artist) {
-        if (titleFlipTimer) {
-            clearInterval(titleFlipTimer);
-            titleFlipTimer = null;
-        }
+        void element.offsetWidth;
 
-        if (title.length > 44) {
-            let splitIdx = title.indexOf(' - ', 25);
-            if (splitIdx === -1) splitIdx = title.indexOf(' (', 25);
-            if (splitIdx === -1) splitIdx = title.indexOf(' ', 35);
-            if (splitIdx === -1) splitIdx = 38;
-
-            const page1 = title.substring(0, splitIdx).trim();
-            const page2 = title.substring(splitIdx).replace(/^[\s\-\•\(\)]+/, '').trim();
-
-            const pages = [page1, page2];
-            let currentPage = 0;
-
-            animateTextChange(songTitleEl, pages[0]);
-            if (artistNameEl) animateTextChange(artistNameEl, artist);
-
-            titleFlipTimer = setInterval(() => {
-                currentPage = (currentPage + 1) % pages.length;
-                animateTextChange(songTitleEl, pages[currentPage]);
-            }, 5000);
-        } else {
-            animateTextChange(songTitleEl, title);
-            if (artistNameEl) animateTextChange(artistNameEl, artist);
+        if (element.scrollWidth > wrapper.clientWidth + 2) {
+            const rawText = element.textContent;
+            const dup = document.createElement('span');
+            dup.className = 'marquee-dup';
+            dup.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;' + escapeHtml(rawText);
+            element.appendChild(dup);
+            element.classList.add('scrolling');
         }
     }
 
@@ -207,7 +179,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 title = data.streamTitle.substring(dashIdx + 3).trim();
             }
 
-            setupTitlePaging(title, artist);
+            if (artistNameEl) artistNameEl.textContent = artist;
+            if (songTitleEl) songTitleEl.textContent = title;
+
+            setTimeout(() => {
+                applyMarqueeScroll(songTitleEl, document.getElementById('song-title-wrapper'));
+                applyMarqueeScroll(artistNameEl, document.getElementById('artist-name-wrapper'));
+            }, 100);
 
             // Set initial Media Session
             if ('mediaSession' in navigator) {

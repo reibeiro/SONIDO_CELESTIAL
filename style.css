@@ -311,41 +311,42 @@ body::before {
     text-transform: uppercase;
 }
 
+.marquee-wrapper {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    margin-bottom: 3px;
+}
+
+.marquee-content {
+    display: inline-block;
+    white-space: nowrap;
+    will-change: transform;
+}
+
+.marquee-content.scrolling {
+    animation: marquee-anim 16s linear infinite;
+}
+
+@keyframes marquee-anim {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+}
+
 #song-title {
-    font-size: clamp(1.02rem, 4.0vw, 1.4rem);
+    font-size: clamp(1.05rem, 4.2vw, 1.38rem);
     font-weight: 700;
     color: #ffffff;
     line-height: 1.25;
-    margin-bottom: 3px;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-    min-height: 2.5em;
+    white-space: nowrap;
 }
 
 #artist-name {
     font-size: clamp(0.82rem, 3.2vw, 0.98rem);
     color: rgba(255, 255, 255, 0.65);
     line-height: 1.25;
-    margin-bottom: 6px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-}
-
-.slide-up-exit {
-    transform: translateY(-20px);
-    opacity: 0;
-}
-
-.slide-up-enter {
-    transform: translateY(20px);
-    opacity: 0;
 }
 
 .playing-indicator {
