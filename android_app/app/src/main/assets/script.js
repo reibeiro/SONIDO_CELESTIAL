@@ -145,6 +145,22 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
+    function checkAndApplyMarquee(element, wrapper) {
+        if (!element || !wrapper) return;
+
+        element.classList.remove('scrolling');
+        const oldDup = element.querySelector('.marquee-dup');
+        if (oldDup) oldDup.remove();
+
+        if (element.scrollWidth > wrapper.clientWidth + 4) {
+            const dup = document.createElement('span');
+            dup.className = 'marquee-dup';
+            dup.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;' + element.innerHTML;
+            element.appendChild(dup);
+            element.classList.add('scrolling');
+        }
+    }
+
     function updateMetadata(data) {
         if (data && data.streamTitle) {
             if (currentStreamTitle === data.streamTitle) return;
@@ -162,6 +178,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             artistNameEl.textContent = artist;
             songTitleEl.textContent = title;
+
+            setTimeout(() => {
+                checkAndApplyMarquee(songTitleEl, document.getElementById('song-title-wrapper'));
+                checkAndApplyMarquee(artistNameEl, document.getElementById('artist-name-wrapper'));
+            }, 120);
 
             // Set initial Media Session
             if ('mediaSession' in navigator) {
