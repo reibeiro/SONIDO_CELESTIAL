@@ -414,7 +414,7 @@ body::before {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Live Program Red Neon Capsule */
+/* Live Program Soft Rose Capsule (Color exacto del botón Limpiar Historial) */
 .live-program-capsule {
     display: flex;
     align-items: center;
@@ -424,14 +424,14 @@ body::before {
     max-width: 100%;
     padding: 6px 12px;
     margin-bottom: 8px;
-    background: rgba(255, 59, 48, 0.08);
-    border: 1px solid rgba(255, 59, 48, 0.45);
+    background: rgba(255, 85, 85, 0.12);
+    border: 1px solid rgba(255, 85, 85, 0.35);
     border-radius: 999px;
-    color: #FF453A;
+    color: #ff6b6b;
     font-size: clamp(0.62rem, 2.7vw, 0.72rem);
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.4px;
-    box-shadow: 0 0 16px rgba(255, 59, 48, 0.3);
+    box-shadow: 0 4px 14px rgba(255, 85, 85, 0.18);
     backdrop-filter: blur(10px);
     white-space: nowrap;
     overflow: hidden;
@@ -440,8 +440,8 @@ body::before {
 
 .live-program-capsule i {
     font-size: 0.78rem;
-    color: #FF3B30;
-    animation: pulse-red-glow 1.8s infinite ease-in-out;
+    color: #ff6b6b;
+    animation: pulse-rose 2s infinite ease-in-out;
     flex-shrink: 0;
 }
 
@@ -451,9 +451,9 @@ body::before {
     white-space: nowrap;
 }
 
-@keyframes pulse-red-glow {
-    0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 4px #FF3B30); }
-    50% { opacity: 0.5; transform: scale(1.18); filter: drop-shadow(0 0 8px #FF3B30); }
+@keyframes pulse-rose {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(1.15); }
 }
 
 .vis-mode-btn {
