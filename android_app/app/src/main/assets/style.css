@@ -414,6 +414,39 @@ body::before {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
+/* Live Program Neon Capsule (Proposal 2) */
+.live-program-capsule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 14px;
+    margin-bottom: 10px;
+    background: rgba(252, 173, 4, 0.08);
+    border: 1px solid rgba(252, 173, 4, 0.32);
+    border-radius: 999px;
+    color: var(--accent-color);
+    font-size: 0.73rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    box-shadow: 0 0 16px rgba(252, 173, 4, 0.22);
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.live-program-capsule i {
+    font-size: 0.82rem;
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(1.15); }
+}
+
 .vis-mode-btn {
     position: absolute;
     top: 8px;

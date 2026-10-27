@@ -652,8 +652,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateLiveProgramBadge() {
-        const liveProgramNameEl = document.getElementById('live-program-name');
-        if (!liveProgramNameEl) return;
+        const liveProgramTextEl = document.getElementById('live-program-text');
+        if (!liveProgramTextEl) return;
 
         const currentCat = getCurrentDayCategory();
         const items = SCHEDULE_DATA[currentCat] || [];
@@ -667,9 +667,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (currentShow) {
-            liveProgramNameEl.textContent = `${currentShow.name.toUpperCase()} (${currentShow.start} - ${currentShow.end})`;
+            liveProgramTextEl.textContent = `EN VIVO: ${currentShow.name.toUpperCase()} (${currentShow.start} - ${currentShow.end})`;
         } else {
-            liveProgramNameEl.textContent = 'ESTAMOS AL AIRE';
+            liveProgramTextEl.textContent = 'PROGRAMACIÓN: ESTAMOS AL AIRE';
         }
     }
 

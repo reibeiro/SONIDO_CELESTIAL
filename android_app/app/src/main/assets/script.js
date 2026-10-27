@@ -651,6 +651,28 @@ document.addEventListener('DOMContentLoaded', () => {
         return currentMins >= startMins && currentMins < endMins;
     }
 
+    function updateLiveProgramBadge() {
+        const liveProgramTextEl = document.getElementById('live-program-text');
+        if (!liveProgramTextEl) return;
+
+        const currentCat = getCurrentDayCategory();
+        const items = SCHEDULE_DATA[currentCat] || [];
+        let currentShow = null;
+
+        for (let i = 0; i < items.length; i++) {
+            if (isTimeCurrent(items[i].start, items[i].end, true)) {
+                currentShow = items[i];
+                break;
+            }
+        }
+
+        if (currentShow) {
+            liveProgramTextEl.textContent = `EN VIVO: ${currentShow.name.toUpperCase()} (${currentShow.start} - ${currentShow.end})`;
+        } else {
+            liveProgramTextEl.textContent = 'PROGRAMACIÓN: ESTAMOS AL AIRE';
+        }
+    }
+
     function getCurrentDayCategory() {
         const day = new Date().getDay();
         if (day === 0) return 'sunday';
