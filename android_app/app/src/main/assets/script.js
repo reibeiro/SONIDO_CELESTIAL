@@ -616,20 +616,38 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
+    function parseTimeToMins(timeStr) {
+        if (!timeStr) return 0;
+        let str = timeStr.toString().trim().toUpperCase();
+
+        const isPM = str.includes('PM');
+        const isAM = str.includes('AM');
+        str = str.replace(/AM|PM/g, '').trim();
+
+        const parts = str.split(':');
+        let hours = parseInt(parts[0], 10) || 0;
+        const mins = parseInt(parts[1], 10) || 0;
+
+        if (isPM && hours < 12) hours += 12;
+        if (isAM && hours === 12) hours = 0;
+
+        return hours * 60 + mins;
+    }
+
     function isTimeCurrent(startStr, endStr, isTodayCategory) {
         if (!isTodayCategory) return false;
         const now = new Date();
         const currentMins = now.getHours() * 60 + now.getMinutes();
 
-        const [sH, sM] = startStr.split(':').map(Number);
-        const [eH, eM] = endStr.split(':').map(Number);
-        const startMins = sH * 60 + sM;
-        let endMins = eH * 60 + eM;
+        const startMins = parseTimeToMins(startStr);
+        const endMins = parseTimeToMins(endStr);
 
-        if (endMins < startMins) {
-            endMins += 24 * 60; // Overnight show
+        // Programa nocturno que cruza la medianoche (ej: 21:00 a 06:00)
+        if (endMins <= startMins) {
+            return currentMins >= startMins || currentMins < endMins;
         }
 
+        // Programa diurno estándar (ej: 08:00 a 10:00)
         return currentMins >= startMins && currentMins < endMins;
     }
 
