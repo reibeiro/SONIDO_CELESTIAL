@@ -414,23 +414,24 @@ body::before {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* Live Program Neon Capsule (Proposal 2) */
+/* Live Program Red Neon Capsule */
 .live-program-capsule {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    padding: 7px 14px;
-    margin-bottom: 10px;
-    background: rgba(252, 173, 4, 0.08);
-    border: 1px solid rgba(252, 173, 4, 0.32);
+    max-width: 100%;
+    padding: 6px 12px;
+    margin-bottom: 8px;
+    background: rgba(255, 59, 48, 0.08);
+    border: 1px solid rgba(255, 59, 48, 0.45);
     border-radius: 999px;
-    color: var(--accent-color);
-    font-size: 0.73rem;
-    font-weight: 700;
+    color: #FF453A;
+    font-size: clamp(0.62rem, 2.7vw, 0.72rem);
+    font-weight: 800;
     letter-spacing: 0.4px;
-    box-shadow: 0 0 16px rgba(252, 173, 4, 0.22);
+    box-shadow: 0 0 16px rgba(255, 59, 48, 0.3);
     backdrop-filter: blur(10px);
     white-space: nowrap;
     overflow: hidden;
@@ -438,13 +439,21 @@ body::before {
 }
 
 .live-program-capsule i {
-    font-size: 0.82rem;
-    animation: pulse-glow 2s infinite ease-in-out;
+    font-size: 0.78rem;
+    color: #FF3B30;
+    animation: pulse-red-glow 1.8s infinite ease-in-out;
+    flex-shrink: 0;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.55; transform: scale(1.15); }
+#live-program-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@keyframes pulse-red-glow {
+    0%, 100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 4px #FF3B30); }
+    50% { opacity: 0.5; transform: scale(1.18); filter: drop-shadow(0 0 8px #FF3B30); }
 }
 
 .vis-mode-btn {

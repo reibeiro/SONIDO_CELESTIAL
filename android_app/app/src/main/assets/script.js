@@ -651,8 +651,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return currentMins >= startMins && currentMins < endMins;
     }
 
+    function getCurrentDayCategory() {
+        const day = new Date().getDay();
+        if (day === 0) return 'sunday';
+        if (day === 6) return 'saturday';
+        return 'weekdays';
+    }
+
     function updateLiveProgramBadge() {
         const liveProgramTextEl = document.getElementById('live-program-text');
+        const capsuleEl = document.getElementById('live-program-capsule');
         if (!liveProgramTextEl) return;
 
         const currentCat = getCurrentDayCategory();
@@ -666,18 +674,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        let fullText = '';
         if (currentShow) {
-            liveProgramTextEl.textContent = `EN VIVO: ${currentShow.name.toUpperCase()} (${currentShow.start} - ${currentShow.end})`;
+            fullText = `EN VIVO: ${currentShow.name.toUpperCase()} (${currentShow.start} - ${currentShow.end})`;
         } else {
-            liveProgramTextEl.textContent = 'PROGRAMACIÓN: ESTAMOS AL AIRE';
+            fullText = 'PROGRAMACIÓN: ESTAMOS AL AIRE';
         }
-    }
 
-    function getCurrentDayCategory() {
-        const day = new Date().getDay();
-        if (day === 0) return 'sunday';
-        if (day === 6) return 'saturday';
-        return 'weekdays';
+        liveProgramTextEl.textContent = fullText;
+
+        // Auto ajuste de marquesina si el texto sobrepasa el ancho de la cápsula
+        if (capsuleEl && liveProgramTextEl) {
+            liveProgramTextEl.classList.remove('scrolling');
+            const oldDup = liveProgramTextEl.querySelector('.marquee-dup');
+            if (oldDup) oldDup.remove();
+
+            void liveProgramTextEl.offsetWidth;
+
+            if (liveProgramTextEl.scrollWidth > capsuleEl.clientWidth - 28) {
+                const dup = document.createElement('span');
+                dup.className = 'marquee-dup';
+                dup.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;' + escapeHtml(fullText);
+                liveProgramTextEl.appendChild(dup);
+                liveProgramTextEl.classList.add('scrolling');
+            }
+        }
     }
 
     let activeDayCategory = getCurrentDayCategory();
@@ -738,7 +759,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
+
+        updateLiveProgramBadge();
     }
+
+    // Inicializar cápsula en vivo y refrescar cada 20 segundos
+    updateLiveProgramBadge();
+    setInterval(updateLiveProgramBadge, 20000);
 
     // --- Notifications Panel (Avisos Importantes) ---
     const notificationsBtn = document.getElementById('notifications-btn');
