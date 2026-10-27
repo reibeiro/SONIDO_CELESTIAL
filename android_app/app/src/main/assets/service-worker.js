@@ -1,4 +1,4 @@
-const CACHE_NAME = 'radio-sonido-celestial-v1.7.2';
+const CACHE_NAME = 'radio-sonido-celestial-v1.7.3';
 const LOCAL_ASSETS = [
     './',
     './index.html',
