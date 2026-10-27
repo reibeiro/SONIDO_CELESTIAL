@@ -145,20 +145,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    function checkAndApplyMarquee(element, wrapper) {
-        if (!element || !wrapper) return;
+    function triggerVerticalSlideUp(title, artist) {
+        if (!songTitleEl || !artistNameEl) return;
 
-        element.classList.remove('scrolling');
-        const oldDup = element.querySelector('.marquee-dup');
-        if (oldDup) oldDup.remove();
+        songTitleEl.classList.add('slide-up-exit');
+        artistNameEl.classList.add('slide-up-exit');
 
-        if (element.scrollWidth > wrapper.clientWidth + 4) {
-            const dup = document.createElement('span');
-            dup.className = 'marquee-dup';
-            dup.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;&nbsp;&nbsp;&nbsp;' + element.innerHTML;
-            element.appendChild(dup);
-            element.classList.add('scrolling');
-        }
+        setTimeout(() => {
+            songTitleEl.textContent = title;
+            artistNameEl.textContent = artist;
+
+            songTitleEl.classList.remove('slide-up-exit');
+            artistNameEl.classList.remove('slide-up-exit');
+            songTitleEl.classList.add('slide-up-enter');
+            artistNameEl.classList.add('slide-up-enter');
+
+            void songTitleEl.offsetWidth;
+
+            setTimeout(() => {
+                songTitleEl.classList.remove('slide-up-enter');
+                artistNameEl.classList.remove('slide-up-enter');
+            }, 30);
+        }, 220);
     }
 
     function updateMetadata(data) {
@@ -176,13 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title = data.streamTitle.substring(dashIdx + 3).trim();
             }
 
-            artistNameEl.textContent = artist;
-            songTitleEl.textContent = title;
-
-            setTimeout(() => {
-                checkAndApplyMarquee(songTitleEl, document.getElementById('song-title-wrapper'));
-                checkAndApplyMarquee(artistNameEl, document.getElementById('artist-name-wrapper'));
-            }, 120);
+            triggerVerticalSlideUp(title, artist);
 
             // Set initial Media Session
             if ('mediaSession' in navigator) {
