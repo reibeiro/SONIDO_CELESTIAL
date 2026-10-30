@@ -330,8 +330,7 @@ body::before {
     white-space: nowrap;
     overflow: hidden;
     position: relative;
-    flex: 1; /* Ocupar todo el espacio restante disponible */
-    min-width: 0; /* Previene desbordamiento en Flexbox */
+    max-width: 145px;
     box-shadow: 0 0 10px rgba(252, 173, 4, 0.15);
 }
 

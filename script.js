@@ -154,12 +154,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const oldDup = element.querySelector('.marquee-dup');
         if (oldDup) oldDup.remove();
 
-        // Forzar cálculo de tamaño ignorando restricciones de Flexbox
-        element.style.position = 'absolute';
-        element.style.visibility = 'hidden';
-        const realScrollWidth = element.scrollWidth;
-        element.style.position = '';
-        element.style.visibility = '';
+        // Creamos un clon temporal invisible para medir la longitud real de la fuente sin cortes de flexbox
+        const clone = element.cloneNode(true);
+        clone.style.position = 'absolute';
+        clone.style.visibility = 'hidden';
+        clone.style.whiteSpace = 'nowrap';
+        clone.style.width = 'auto';
+        document.body.appendChild(clone);
+        const realScrollWidth = clone.scrollWidth;
+        document.body.removeChild(clone);
 
         if (realScrollWidth > wrapper.clientWidth + 2) {
             const rawText = element.textContent;
