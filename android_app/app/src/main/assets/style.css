@@ -301,14 +301,53 @@ body::before {
     min-width: 0;
 }
 
+.np-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin-bottom: 4px;
+    width: 100%;
+}
+
 .np-label {
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.45);
     letter-spacing: 0.8px;
-    margin-bottom: 6px;
     display: block;
     text-transform: uppercase;
+}
+
+.np-show-tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    background: rgba(252, 173, 4, 0.1);
+    border: 1px solid rgba(252, 173, 4, 0.28);
+    padding: 2px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 155px;
+    box-shadow: 0 0 10px rgba(252, 173, 4, 0.15);
+}
+
+.np-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.live-program-schedule {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #25D366;
+    letter-spacing: 0.4px;
 }
 
 #song-title {

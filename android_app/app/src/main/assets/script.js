@@ -659,9 +659,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateLiveProgramBadge() {
-        const liveProgramTextEl = document.getElementById('live-program-text');
-        const capsuleEl = document.getElementById('live-program-capsule');
-        if (!liveProgramTextEl) return;
+        const showTagEl = document.getElementById('np-show-tag');
+        const scheduleEl = document.getElementById('live-program-schedule');
 
         const currentCat = getCurrentDayCategory();
         const items = SCHEDULE_DATA[currentCat] || [];
@@ -674,30 +673,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        let fullText = '';
         if (currentShow) {
-            fullText = `EN VIVO [${currentShow.start} - ${currentShow.end}]: ${currentShow.name.toUpperCase()}`;
+            if (showTagEl) showTagEl.textContent = `🎙️ ${currentShow.name}`;
+            if (scheduleEl) scheduleEl.textContent = `${currentShow.start} - ${currentShow.end}`;
         } else {
-            fullText = 'PROGRAMACIÓN: ESTAMOS AL AIRE';
-        }
-
-        liveProgramTextEl.textContent = fullText;
-
-        // Auto ajuste de marquesina si el texto sobrepasa el ancho de la cápsula
-        if (capsuleEl && liveProgramTextEl) {
-            liveProgramTextEl.classList.remove('scrolling');
-            const oldDup = liveProgramTextEl.querySelector('.marquee-dup');
-            if (oldDup) oldDup.remove();
-
-            void liveProgramTextEl.offsetWidth;
-
-            if (liveProgramTextEl.scrollWidth > capsuleEl.clientWidth - 28) {
-                const dup = document.createElement('span');
-                dup.className = 'marquee-dup';
-                dup.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;' + escapeHtml(fullText);
-                liveProgramTextEl.appendChild(dup);
-                liveProgramTextEl.classList.add('scrolling');
-            }
+            if (showTagEl) showTagEl.textContent = '📻 Radio Vivo';
+            if (scheduleEl) scheduleEl.textContent = '24/7';
         }
     }
 

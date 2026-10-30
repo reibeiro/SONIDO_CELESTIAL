@@ -83,15 +83,21 @@
             <div class="now-playing-card" id="now-playing-card">
                 <img src="logo.png" id="mini-art" alt="Album Art">
                 <div class="now-playing-info">
-                    <span class="np-label"><i class="fas fa-signal"></i> AHORA SONANDO</span>
+                    <div class="np-header-row">
+                        <span class="np-label"><i class="fas fa-signal"></i> AHORA SONANDO</span>
+                        <span id="np-show-tag" class="np-show-tag">🎙️ Programa</span>
+                    </div>
                     <div id="song-title">Cargando...</div>
                     <div id="artist-name">Radio Sonido Celestial</div>
-                    <span class="playing-indicator">
-                        <span class="indicator-bar"></span>
-                        <span class="indicator-bar"></span>
-                        <span class="indicator-bar"></span>
-                        Estamos al aire
-                    </span>
+                    <div class="np-footer-row">
+                        <span class="playing-indicator">
+                            <span class="indicator-bar"></span>
+                            <span class="indicator-bar"></span>
+                            <span class="indicator-bar"></span>
+                            EN VIVO
+                        </span>
+                        <span id="live-program-schedule" class="live-program-schedule">24/7</span>
+                    </div>
                 </div>
             </div>
 
@@ -100,12 +106,6 @@
                 <i class="fas fa-chart-simple"></i>
             </button>
             <canvas id="visualizer-canvas" class="visualizer-canvas"></canvas>
-        </div>
-
-        <!-- Live Program Neon Capsule (Proposal 2) -->
-        <div id="live-program-capsule" class="live-program-capsule">
-            <i class="fas fa-radio"></i>
-            <span id="live-program-text">EN VIVO: PROGRAMA ACTUAL</span>
         </div>
 
         <!-- Main Action Grid (High Visibility Listener Toolbox) -->
