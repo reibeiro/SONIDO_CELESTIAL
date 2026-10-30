@@ -170,6 +170,18 @@ document.addEventListener('DOMContentLoaded', () => {
             dup.className = 'marquee-dup';
             dup.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;' + escapeHtml(rawText);
             element.appendChild(dup);
+
+            // Medir la distancia a recorrer: Exactamente el ancho del texto original más el espacio de separación
+            // Asumiremos que el espacio de separación es aproximadamente de 30px
+            const distanceToScroll = realScrollWidth + 30;
+
+            // Inyectar el valor matemático exacto en CSS
+            element.style.setProperty('--marquee-dist', `-${distanceToScroll}px`);
+
+            // Calcular el tiempo para que siempre viaje a la misma velocidad sin importar qué tan largo sea
+            const speedTime = Math.max(10, distanceToScroll / 30);
+            element.style.setProperty('--marquee-time', `${speedTime}s`);
+
             element.classList.add('scrolling');
         }
     }

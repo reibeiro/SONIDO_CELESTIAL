@@ -330,7 +330,8 @@ body::before {
     white-space: nowrap;
     overflow: hidden;
     position: relative;
-    max-width: 145px;
+    flex: 1;
+    min-width: 0;
     box-shadow: 0 0 10px rgba(252, 173, 4, 0.15);
 }
 
@@ -385,6 +386,22 @@ body::before {
 .slide-up-enter {
     transform: translateY(20px);
     opacity: 0;
+}
+
+.marquee-content {
+    display: inline-block;
+    white-space: nowrap;
+    will-change: transform;
+}
+
+.marquee-content.scrolling {
+    /* Usamos una variable CSS inyectada desde JS con la distancia real en píxeles */
+    animation: marquee-dynamic var(--marquee-time, 14s) linear infinite;
+}
+
+@keyframes marquee-dynamic {
+    0% { transform: translateX(0px); }
+    100% { transform: translateX(var(--marquee-dist, -50%)); }
 }
 
 .playing-indicator {
