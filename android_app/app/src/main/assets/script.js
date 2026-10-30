@@ -147,6 +147,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let titleFlipTimer = null;
 
+    function applyMarqueeScroll(element, wrapper) {
+        if (!element || !wrapper) return;
+
+        element.classList.remove('scrolling');
+        const oldDup = element.querySelector('.marquee-dup');
+        if (oldDup) oldDup.remove();
+
+        // Forzar cálculo de tamaño ignorando restricciones de Flexbox
+        element.style.position = 'absolute';
+        element.style.visibility = 'hidden';
+        const realScrollWidth = element.scrollWidth;
+        element.style.position = '';
+        element.style.visibility = '';
+
+        if (realScrollWidth > wrapper.clientWidth + 2) {
+            const rawText = element.textContent;
+            const dup = document.createElement('span');
+            dup.className = 'marquee-dup';
+            dup.innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;✦&nbsp;&nbsp;&nbsp;&nbsp;' + escapeHtml(rawText);
+            element.appendChild(dup);
+            element.classList.add('scrolling');
+        }
+    }
+
     function animateTextChange(el, newText) {
         if (!el) return;
         el.classList.add('slide-up-exit');
