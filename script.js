@@ -687,8 +687,12 @@ document.addEventListener('DOMContentLoaded', () => {
         showTagText.textContent = showName;
 
         setTimeout(() => {
-            applyMarqueeScroll(showTagText, showTagWrapper);
-        }, 100);
+            // El wrapper DEBE forzar la activación de applyMarqueeScroll
+            // Usando offsetWidth en lugar de clientWidth porque a veces flex-box miente
+            if (showTagText.offsetWidth > showTagWrapper.clientWidth + 2) {
+                applyMarqueeScroll(showTagText, showTagWrapper);
+            }
+        }, 150);
     }
 
     let activeDayCategory = getCurrentDayCategory();
