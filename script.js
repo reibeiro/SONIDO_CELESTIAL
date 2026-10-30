@@ -659,8 +659,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateLiveProgramBadge() {
-        const showTagEl = document.getElementById('np-show-tag');
+        const showTagWrapper = document.getElementById('np-show-wrapper');
+        const showTagText = document.getElementById('np-show-text');
         const scheduleEl = document.getElementById('live-program-schedule');
+        if (!showTagText) return;
 
         const currentCat = getCurrentDayCategory();
         const items = SCHEDULE_DATA[currentCat] || [];
@@ -673,13 +675,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        let showName = '';
         if (currentShow) {
-            if (showTagEl) showTagEl.textContent = `🎙️ ${currentShow.name}`;
+            showName = `🎙️ ${currentShow.name}`;
             if (scheduleEl) scheduleEl.textContent = `${currentShow.start} - ${currentShow.end}`;
         } else {
-            if (showTagEl) showTagEl.textContent = '📻 Radio Vivo';
+            showName = '📻 Radio Vivo';
             if (scheduleEl) scheduleEl.textContent = '24/7';
         }
+
+        showTagText.textContent = showName;
+
+        setTimeout(() => {
+            applyMarqueeScroll(showTagText, showTagWrapper);
+        }, 100);
     }
 
     let activeDayCategory = getCurrentDayCategory();

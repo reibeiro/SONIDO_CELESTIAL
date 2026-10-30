@@ -329,7 +329,7 @@ body::before {
     border-radius: 8px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    position: relative;
     max-width: 155px;
     box-shadow: 0 0 10px rgba(252, 173, 4, 0.15);
 }
