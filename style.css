@@ -388,22 +388,6 @@ body::before {
     opacity: 0;
 }
 
-.marquee-content {
-    display: inline-block;
-    white-space: nowrap;
-    will-change: transform;
-}
-
-.marquee-content.scrolling {
-    /* Usamos una variable CSS inyectada desde JS con la distancia real en píxeles */
-    animation: marquee-dynamic var(--marquee-time, 14s) linear infinite;
-}
-
-@keyframes marquee-dynamic {
-    0% { transform: translateX(0px); }
-    100% { transform: translateX(var(--marquee-dist, -50%)); }
-}
-
 .playing-indicator {
     display: flex;
     align-items: center;
@@ -507,6 +491,21 @@ body::before {
     white-space: nowrap;
 }
 
+.marquee-content {
+    display: inline-block;
+    white-space: nowrap;
+    will-change: transform;
+}
+
+.marquee-content.scrolling {
+    animation: marquee-dynamic var(--marquee-time, 14s) linear infinite;
+}
+
+@keyframes marquee-dynamic {
+    0% { transform: translateX(0px); }
+    100% { transform: translateX(var(--marquee-dist, -50%)); }
+}
+
 @keyframes pulse-rose {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.55; transform: scale(1.15); }
@@ -585,17 +584,27 @@ body::before {
     border-color: var(--accent-color);
     box-shadow: 0 0 16px rgba(252, 173, 4, 0.35);
 }
-    0%, 100% { transform: scaleY(0.05); }
-    12% { transform: scaleY(0.7); }
-    25% { transform: scaleY(0.2); }
-    37% { transform: scaleY(0.9); }
-    50% { transform: scaleY(0.1); }
-    62% { transform: scaleY(0.5); }
-    75% { transform: scaleY(0.85); }
-    87% { transform: scaleY(0.3); }
+
+.unread-badge {
+    position: absolute;
+    top: -4px;
+    right: 8px;
+    width: 10px;
+    height: 10px;
+    background: #ff4757;
+    border-radius: 50%;
+    border: 2px solid #141418;
+    box-shadow: 0 0 8px rgba(255, 71, 87, 0.8);
+    animation: pulse-badge-red 1.5s infinite;
 }
 
-/* 5. Social Row */
+@keyframes pulse-badge-red {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 71, 87, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
+
+/* 6. Social Row */
 .social-row {
     display: flex;
     justify-content: center;
@@ -943,7 +952,32 @@ input[type=range]::-webkit-slider-thumb {
     align-items: center;
     gap: 12px;
     padding: 8px 20px;
-    transition: background 0.15s;
+    transition: transform 0.3s ease, opacity 0.3s ease, background 0.15s;
+    will-change: transform, opacity;
+}
+
+.history-item.swipe-exit {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.notification-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: visible;
+    transition: transform 0.3s ease, opacity 0.3s ease, background 0.15s;
+    will-change: transform, opacity;
+}
+
+.notification-item.swipe-exit {
+    transform: translateX(-100%);
+    opacity: 0;
 }
 
 .history-item:active {

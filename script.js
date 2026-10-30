@@ -806,6 +806,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationsModal = document.getElementById('notifications-modal');
     const notificationsCloseBtn = document.getElementById('notifications-close');
     const notificationsList = document.getElementById('notifications-list');
+    const unreadBadge = document.getElementById('unread-badge');
+
+    const LAST_OPENED_NOTIFS_KEY = 'radio_last_opened_notifs';
+    const DISMISSED_NOTIFS_KEY = 'radio_dismissed_notifs';
+
+    function getDismissedNotifs() {
+        try {
+            return JSON.parse(localStorage.getItem(DISMISSED_NOTIFS_KEY)) || [];
+        } catch { return []; }
+    }
+
+    function addDismissedNotif(id) {
+        const list = getDismissedNotifs();
+        if (!list.includes(id)) {
+            list.push(id);
+            if (list.length > 50) list.shift(); // Evitar memory leak local
+            localStorage.setItem(DISMISSED_NOTIFS_KEY, JSON.stringify(list));
+        }
+    }
 
     function formatTimeAgo(isoString) {
         if (!isoString) return 'Hace poco';
@@ -821,6 +840,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const diffDays = Math.floor(diffHours / 24);
         if (diffDays === 1) return 'Ayer';
         return `Hace ${diffDays} días`;
+    }
+
+    function attachSwipeEvents(element, docId) {
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        element.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            element.style.transition = 'none';
+        }, { passive: true });
+
+        element.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            currentX = e.touches[0].clientX - startX;
+            // Solo permitir deslizar hacia la izquierda o derecha
+            element.style.transform = `translateX(${currentX}px)`;
+            element.style.opacity = Math.max(0, 1 - Math.abs(currentX) / 150);
+        }, { passive: true });
+
+        element.addEventListener('touchend', () => {
+            isDragging = false;
+            element.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+            if (Math.abs(currentX) > 80) {
+                // Swipe exitoso (Descartar)
+                element.classList.add('swipe-exit');
+                addDismissedNotif(docId);
+                setTimeout(() => element.remove(), 300);
+
+                // Si ya no quedan elementos visibles
+                setTimeout(() => {
+                    if (!notificationsList.querySelector('.notification-item')) {
+                        notificationsList.innerHTML = '<div class="notifications-empty">No hay avisos recientes por el momento.</div>';
+                    }
+                }, 310);
+            } else {
+                // Rebotar al centro
+                element.style.transform = 'translateX(0)';
+                element.style.opacity = '1';
+            }
+        });
     }
 
     function loadRecentNotifications() {
@@ -844,12 +905,18 @@ document.addEventListener('DOMContentLoaded', () => {
               .get()
               .then((querySnapshot) => {
                   notificationsList.innerHTML = '';
+                  const dismissedList = getDismissedNotifs();
+                  let hasVisibleItems = false;
+
                   if (querySnapshot.empty) {
                       notificationsList.innerHTML = '<div class="notifications-empty">No hay avisos recientes por el momento.</div>';
                       return;
                   }
 
                   querySnapshot.forEach((doc) => {
+                      if (dismissedList.includes(doc.id)) return; // Omitir descartados
+
+                      hasVisibleItems = true;
                       const data = doc.data();
                       const div = document.createElement('div');
                       div.className = 'notification-item';
@@ -858,8 +925,13 @@ document.addEventListener('DOMContentLoaded', () => {
                           <div class="notification-item-body">${data.body || ''}</div>
                           <div class="notification-item-time"><i class="far fa-clock"></i> ${formatTimeAgo(data.createdAt)}</div>
                       `;
+                      attachSwipeEvents(div, doc.id);
                       notificationsList.appendChild(div);
                   });
+
+                  if (!hasVisibleItems) {
+                      notificationsList.innerHTML = '<div class="notifications-empty">No hay avisos recientes por el momento.</div>';
+                  }
               })
               .catch((err) => {
                   notificationsList.innerHTML = `<div class="notifications-empty">Error al cargar avisos: ${err.message}</div>`;
@@ -869,12 +941,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Escuchador silencioso para encender el punto rojo
+    function checkForUnreadNotifications() {
+        if (typeof db === 'undefined' || !db || !unreadBadge) return;
+
+        db.collection('notification_requests')
+          .orderBy('createdAt', 'desc')
+          .limit(1)
+          .onSnapshot(snapshot => {
+              if (!snapshot.empty) {
+                  const latestDoc = snapshot.docs[0];
+                  const latestTime = new Date(latestDoc.data().createdAt).getTime();
+                  const lastOpened = parseInt(localStorage.getItem(LAST_OPENED_NOTIFS_KEY) || '0', 10);
+
+                  // Si hay un doc más nuevo que la última vez que abrí la campana, y no lo he descartado
+                  const dismissedList = getDismissedNotifs();
+                  if (latestTime > lastOpened && !dismissedList.includes(latestDoc.id)) {
+                      unreadBadge.style.display = 'block';
+                  }
+              }
+          }, err => console.warn('Unread badge listener:', err));
+    }
+
+    // Iniciar escáner de novedades a los 2 segundos de abrir la app
+    setTimeout(checkForUnreadNotifications, 2000);
+
     function toggleNotificationsModal(open) {
         if (!notificationsOverlay || !notificationsModal) return;
         const isOpen = open !== undefined ? open : !notificationsModal.classList.contains('active');
         if (isOpen) {
             notificationsOverlay.classList.add('active');
             notificationsModal.classList.add('active');
+
+            // Apagar la alarma visual y guardar tiempo de apertura
+            localStorage.setItem(LAST_OPENED_NOTIFS_KEY, Date.now().toString());
+            if (unreadBadge) unreadBadge.style.display = 'none';
+
             loadRecentNotifications();
         } else {
             notificationsOverlay.classList.remove('active');
