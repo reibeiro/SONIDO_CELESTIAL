@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let fullText = '';
         if (currentShow) {
-            fullText = `EN VIVO: ${currentShow.name.toUpperCase()} (${currentShow.start} - ${currentShow.end})`;
+            fullText = `EN VIVO [${currentShow.start} - ${currentShow.end}]: ${currentShow.name.toUpperCase()}`;
         } else {
             fullText = 'PROGRAMACIÓN: ESTAMOS AL AIRE';
         }
