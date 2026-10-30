@@ -587,7 +587,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const senderName = name.length > 0 ? name : 'Anónimo';
             const formattedMsg = `*Petición de Oración - Radio Sonido Celestial* 🙏\n\n*Nombre:* ${senderName}\n*Petición:* ${message}`;
-            const waUrl = `https://wa.me/573145377834?text=${encodeURIComponent(formattedMsg)}`;
+            const waNumber = activeWhatsAppNumber.replace(/\D/g, '');
+            const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(formattedMsg)}`;
 
             window.open(waUrl, '_blank');
 
@@ -941,6 +942,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- WhatsApp Dynamic Settings ---
+    let activeWhatsAppNumber = '573145377834'; // Fallback por defecto
+
+    if (typeof db !== 'undefined' && db) {
+        db.collection('settings').doc('contact_info').onSnapshot(doc => {
+            if (doc && doc.exists) {
+                const data = doc.data();
+                if (data.whatsappNumber) {
+                    activeWhatsAppNumber = data.whatsappNumber;
+                    updateWhatsAppLinks();
+                }
+            }
+        });
+    }
+
+    function updateWhatsAppLinks() {
+        const waNumber = activeWhatsAppNumber.replace(/\D/g, ''); // Limpiar el número
+
+        // 1. Botón de la pestaña Info
+        const infoWaBtn = document.querySelector('.info-section a.secondary-info-btn[href*="wa.me"]');
+        if (infoWaBtn) {
+            infoWaBtn.href = `https://wa.me/${waNumber}`;
+        }
+
+        // 2. Botón del menú lateral (Drawer)
+        const drawerWaBtn = document.querySelector('.drawer-menu-item[href*="wa.me"]');
+        if (drawerWaBtn) {
+            drawerWaBtn.href = `https://wa.me/${waNumber}?text=Hola%20Radio%20Sonido%20Celestial`;
+        }
+    }
+
     // Escuchador silencioso para encender el punto rojo
     function checkForUnreadNotifications() {
         if (typeof db === 'undefined' || !db || !unreadBadge) return;
@@ -1070,6 +1102,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderSchedule(activeDayCategory);
             updateLiveVideoUI();
+        });
+    }
+
+    // --- WhatsApp Contact Admin Handler ---
+    const saveWaNumberBtn = document.getElementById('save-wa-number-btn');
+    if (saveWaNumberBtn) {
+        saveWaNumberBtn.addEventListener('click', () => {
+            const inputVal = document.getElementById('admin-wa-number')?.value.replace(/\D/g, '');
+            if (!inputVal || inputVal.length < 10) {
+                showToast('Ingresa un número de móvil válido con código de país');
+                return;
+            }
+
+            if (typeof db !== 'undefined' && db && isAdmin) {
+                db.collection('settings').doc('contact_info').set({
+                    whatsappNumber: inputVal,
+                    updatedAt: new Date().toISOString()
+                }).then(() => {
+                    showToast('📞 Número de WhatsApp actualizado en vivo');
+                    document.getElementById('admin-wa-number').value = '';
+                }).catch(err => {
+                    showToast('Error al actualizar WhatsApp: ' + err.message);
+                });
+            } else {
+                showToast('Debes iniciar sesión como Admin');
+            }
         });
     }
 

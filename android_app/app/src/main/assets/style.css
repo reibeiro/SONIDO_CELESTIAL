@@ -2763,8 +2763,8 @@ input[type=range]::-webkit-slider-thumb {
     background: rgba(255, 255, 255, 0.18);
 }
 
-/* Admin Video Card in Admin Modal */
-.admin-video-card {
+/* Admin Settings Cards */
+.admin-video-card, .admin-contact-card {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(252, 173, 4, 0.25);
     border-radius: 20px;
@@ -2773,11 +2773,37 @@ input[type=range]::-webkit-slider-thumb {
     text-align: left;
 }
 
-.admin-video-card-title {
+.admin-video-card-title, .admin-contact-card-title {
     font-size: 0.92rem;
     font-weight: 700;
     color: var(--accent-color);
     margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.save-wa-number-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #25D366 0%, #1da855 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+}
+
+.save-wa-number-btn:active {
+    transform: scale(0.97);
+}
     display: flex;
     align-items: center;
     gap: 8px;
