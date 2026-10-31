@@ -3,7 +3,7 @@
 <!-- ========================================== -->
 
 <p align="center">
-  <img src="https://img.shields.io/badge/versión-1.7.0-FCAD04?style=for-the-badge" alt="Versión">
+  <img src="https://img.shields.io/badge/versión-1.7.3-FCAD04?style=for-the-badge" alt="Versión">
   <img src="https://img.shields.io/badge/Android-API%2024%2B-brightgreen?style=for-the-badge&logo=android" alt="Android">
   <img src="https://img.shields.io/badge/Target%20SDK-36%20(Android%2016)-blue?style=for-the-badge&logo=google-play" alt="Target SDK 36">
   <img src="https://img.shields.io/badge/licencia-MIT-green?style=for-the-badge" alt="Licencia">
@@ -52,7 +52,7 @@
 
 ---
 
-### ✨ Características Principales (v1.7.0)
+### ✨ Características Principales (v1.7.3)
 
 - 🎧 **Streaming en Vivo 24/7:** Reproducción continua en segundo plano con Media3 ExoPlayer, control en pantalla de bloqueo, metadatos Bluetooth e integración de carátulas HD (`600x600`).
 - 📖 **Versículo del Día & Biblia RVR1960:** Notificaciones automáticas programadas (8:00 AM y 8:00 PM Colombia `America/Bogota`) con promesas bíblicas. Redirección táctil directa a la pestaña de la Biblia al presionar la alerta.
